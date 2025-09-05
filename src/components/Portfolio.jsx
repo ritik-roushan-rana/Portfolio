@@ -72,7 +72,7 @@ export default function Portfolio() {
       title: "VTour – Virtual Campus Tour App",
       description:
         "Built a mobile app to guide students through virtual campus tours using Flutter. Designed intuitive UI/UX for a smooth and interactive navigation experience. Provided students with easy access to campus maps, departments, and facility information.",
-      tech: ["Flutter", "Firebase", "UI/UX", "Android Development"],
+      tech: ["Flutter", "Supabase", "UI/UX", "Android Development"],
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
       github: "https://github.com/SHIELD78/VTOUR",
