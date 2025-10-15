@@ -25,10 +25,26 @@ import TypingEffect from "./TypingEffect";
 
 export default function Portfolio() {
   const [isVisible, setIsVisible] = useState(false);
+  const [expandedTech, setExpandedTech] = useState({});
+  const [expandedDesc, setExpandedDesc] = useState({});
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const toggleTechExpansion = (projectIndex) => {
+    setExpandedTech(prev => ({
+      ...prev,
+      [projectIndex]: !prev[projectIndex]
+    }));
+  };
+
+  const toggleDescExpansion = (projectIndex) => {
+    setExpandedDesc(prev => ({
+      ...prev,
+      [projectIndex]: !prev[projectIndex]
+    }));
+  };
 
   const handleNavClick = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -44,30 +60,72 @@ export default function Portfolio() {
     {
       category: "Programming Languages",
       icon: Terminal,
-      skills: ["C++", "Java", "JavaScript", "Dart"],
+      skills: [
+        "Python",
+        "Java",
+        "C",
+        "C++",
+        "JavaScript",
+        "TypeScript",
+        "HTML",
+        "CSS",
+        "SQL",
+        "Dart"
+      ],
       color: "from-blue-600 to-blue-400",
     },
     {
-      category: "Tools & Technologies",
-      icon: Zap,
-      skills: ["Git", "Postman", "Wireshark", "ELK Stack", "MongoDB"],
-      color: "from-green-600 to-green-400",
+      category: "Frameworks & Libraries",
+      icon: Server,
+      skills: [
+        "React.js",
+        "Next.js",
+        "Express.js",
+        "PyTorch",
+        "Stable-Baselines3",
+        "OpenCV",
+        "Flutter"
+      ],
+      color: "from-purple-600 to-purple-400",
     },
     {
-      category: "Frameworks",
-      icon: Server,
-      skills: ["Flutter", "Express.js", "React"],
-      color: "from-purple-600 to-purple-400",
+      category: "DevOps & Toolkits",
+      icon: Zap,
+      skills: [
+        "Git",
+        "Postman",
+        "Wireshark",
+        "ELK Stack",
+        "MongoDB",
+        "Matplotlib",
+        "Plotly"
+      ],
+      color: "from-green-600 to-green-400",
     },
     {
       category: "Platforms & OS",
       icon: Shield,
-      skills: ["Ubuntu", "Kali Linux", "VirtualBox", "Clerk Auth"],
+      skills: [
+        "Ubuntu",
+        "Kali Linux",
+        "VirtualBox",
+        "Clerk Auth"
+      ],
       color: "from-red-600 to-red-400",
     },
   ];
 
   const projects = [
+    {
+      title: "Optifolio – AI Portfolio Rebalancing App",
+      description:
+        "Reinforcement Learning-driven portfolio rebalancer using Deep Q-Learning to optimize rebalancing policies from historical market data. Maximizes risk-adjusted returns while respecting user risk profiles and transaction costs. Features Flutter iOS app for goal setting, backtesting on ETFs/stocks, and actionable rebalancing suggestions with performance visualization.",
+      tech: ["Python", "PyTorch", "Stable-Baselines3", "Flutter", "Express.js", "MongoDB", "Yahoo Finance API", "Quandl", "Matplotlib", "Plotly"],
+      icon: Zap,
+      color: "from-yellow-500 to-orange-500",
+      github: "https://github.com/ritik-roushan-rana/OptiFolio",
+      demo: "https://optifolio-demo.netlify.app",
+    },
     {
       title: "VTour – Virtual Campus Tour App",
       description:
@@ -76,6 +134,7 @@ export default function Portfolio() {
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
       github: "https://github.com/SHIELD78/VTOUR",
+      demo: "https://vtour-app-demo.netlify.app",
     },
     {
       title: "SSH Honeypot with ELK Stack",
@@ -84,6 +143,7 @@ export default function Portfolio() {
       tech: ["Cybersecurity", "Cowrie", "Ubuntu", "ELK", "Virtual Machines"],
       icon: Bug,
       color: "from-red-500 to-pink-500",
+      github: "https://github.com/SHIELD78/SSH-Honeypot-ELK",
       demo: "https://youtu.be/6NElUW4gqSc",
     },
     {
@@ -94,6 +154,7 @@ export default function Portfolio() {
       icon: Terminal,
       color: "from-purple-500 to-violet-500",
       github: "https://github.com/SHIELD78/web-project",
+      demo: "https://organizo-task-manager.netlify.app",
     },
   ];
 
@@ -222,7 +283,7 @@ export default function Portfolio() {
 
                 <p className="text-xl text-gray-300 leading-relaxed font-mono">
                   <TypingEffect
-                    text="Detail-oriented and motivated Computer Science and Engineering undergraduate at VIT Vellore with hands-on experience in cybersecurity through an internship at IBM as a Cyber Security Analyst."
+                    text="I’m a Computer Science student at VIT Vellore specializing in mobile and frontend development, creating responsive, user-focused apps with Flutter and modern frameworks, driven by a passion for cybersecurity and AI to build secure and innovative digital experiences."
                     speed={30}
                   />
                 </p>
@@ -399,32 +460,31 @@ export default function Portfolio() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
             {skillGroups.map((skillGroup, index) => (
               <div
                 key={index}
                 className="relative group hover:-translate-y-2 hover:scale-105 transition-all duration-300"
               >
-                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-lg p-6 h-full hover:border-cyan-500/50 transition-all duration-300">
-                  <div
-                    className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r ${skillGroup.color} rounded-lg mb-4 group-hover:scale-110 transition-transform`}
-                  >
-                    <skillGroup.icon className="h-6 w-6 text-white" />
+                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-lg p-8 h-full hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row md:space-x-8">
+                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${skillGroup.color} rounded-lg mb-4 group-hover:scale-110 transition-transform`}>
+                    <skillGroup.icon className="h-8 w-20 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-4 font-mono">
-                    {skillGroup.category}
-                  </h3>
-                  <div className="space-y-2">
-                    {skillGroup.skills.map((skill, skillIndex) => (
-                      <div key={skillIndex}>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-4 font-mono">
+                      {skillGroup.category}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {skillGroup.skills.map((skill, skillIndex) => (
                         <Badge
+                          key={skillIndex}
                           variant="outline"
                           className="border-gray-600 text-gray-300 bg-gray-800/50 hover:border-cyan-500 hover:text-cyan-400 transition-colors font-mono text-xs"
                         >
                           {skill}
                         </Badge>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -445,70 +505,115 @@ export default function Portfolio() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {projects.map((project, index) => (
               <div
                 key={index}
-                className="group relative hover:-translate-y-2 hover:scale-105 transition-all duration-300"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-950/95 to-black/95 backdrop-blur-sm border border-gray-800/60 hover:border-cyan-500/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/20 shadow-lg shadow-black/50"
               >
-                <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 hover:border-cyan-500/50 transition-all duration-300 h-full">
-                  <div className="p-6">
-                    <div className="flex items-center space-x-3 mb-4">
+                {/* Project Preview/Header */}
+                <div className="relative h-36 bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+                  {/* Animated Background Pattern */}
+                  <div className="absolute inset-0 opacity-15">
+                    <div
+                      className={`w-full h-full bg-gradient-to-r ${project.color} opacity-20`}
+                    />
+                  </div>
+                  
+                  {/* Floating Tech Icons */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative">
                       <div
-                        className={`p-2 rounded-lg bg-gradient-to-r ${project.color} group-hover:scale-110 transition-transform`}
+                        className={`p-3 rounded-xl bg-gradient-to-r ${project.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}
                       >
-                        <project.icon className="h-5 w-5 text-white" />
+                        <project.icon className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="text-white font-mono text-lg font-semibold">
-                        {project.title}
-                      </h3>
-                    </div>
-                    <p className="text-gray-400 font-mono text-sm leading-relaxed mb-4">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.tech.map((tech, techIndex) => (
-                        <Badge
-                          key={techIndex}
-                          variant="outline"
-                          className="border-gray-600 text-gray-300 bg-gray-800/50 font-mono text-xs"
-                        >
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex space-x-3">
-                      {/* Show Code button unless it's the ELK project */}
-                      {project.title !== "SSH Honeypot + ELK + Wireshark" &&
-                        project.github && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-gray-600 text-gray-300 hover:border-green-500 hover:text-green-400 font-mono bg-transparent hover:scale-105 transition-all"
-                            onClick={() =>
-                              window.open(project.github, "_blank")
-                            }
-                          >
-                            <Github className="mr-2 h-3 w-3" />
-                            Code
-                          </Button>
-                        )}
-
-                      {/* Always show Demo button if available */}
-                      {project.demo && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-gray-600 text-gray-300 hover:border-cyan-500 hover:text-cyan-400 font-mono bg-transparent hover:scale-105 transition-all"
-                          onClick={() => window.open(project.demo, "_blank")}
-                        >
-                          <ExternalLink className="mr-2 h-3 w-3" />
-                          Demo
-                        </Button>
-                      )}
+                      
+                      {/* Orbiting elements */}
+                      <div className="absolute -top-2 -right-2 w-4 h-4 bg-cyan-400 rounded-full animate-ping opacity-75"></div>
+                      <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                     </div>
                   </div>
-                </Card>
+
+                  {/* Grid Pattern Overlay */}
+                  <div className="absolute inset-0 opacity-10" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ff41' fill-opacity='0.1'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M0 30h60M30 0v60' stroke='%2300ff41' stroke-width='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                  }} />
+                </div>
+
+                {/* Project Content */}
+                <div className="p-5 relative">
+                  {/* Title with gradient text */}
+                  <h3 className="text-lg font-bold mb-2 font-mono bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-green-400 transition-all duration-300">
+                    {project.title}
+                  </h3>
+                  
+                  {/* Description */}
+                  <div className="mb-4">
+                    <p className={`text-gray-400 font-mono text-xs leading-relaxed ${expandedDesc[index] ? '' : 'line-clamp-3'}`}>
+                      {project.description}
+                    </p>
+                    {project.description.length > 120 && (
+                      <button
+                        onClick={() => toggleDescExpansion(index)}
+                        className="text-cyan-400 hover:text-cyan-300 font-mono text-xs mt-1 transition-colors"
+                      >
+                        {expandedDesc[index] ? 'show less' : 'read more...'}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Tech Stack */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {(expandedTech[index] ? project.tech : project.tech.slice(0, 5)).map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="px-2 py-1 text-xs font-mono bg-gray-800/80 text-gray-300 rounded-full border border-gray-600/50 hover:border-cyan-500/50 hover:text-cyan-400 transition-colors"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {project.tech.length > 5 && (
+                      <button
+                        onClick={() => toggleTechExpansion(index)}
+                        className="px-2 py-1 text-xs font-mono bg-gray-800/80 text-gray-500 hover:text-cyan-400 rounded-full border border-gray-600/50 hover:border-cyan-500/50 transition-colors cursor-pointer"
+                      >
+                        {expandedTech[index] ? 'show less' : `+${project.tech.length - 5}`}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    {project.github && (
+                      <button
+                        onClick={() => window.open(project.github, "_blank")}
+                        className="flex-1 py-2.5 px-3 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-green-600 hover:to-cyan-600 text-white font-mono text-xs rounded-lg border border-gray-600 hover:border-transparent transition-all duration-300 hover:scale-105 hover:shadow-md flex items-center justify-center space-x-1.5"
+                      >
+                        <Github className="h-3.5 w-3.5" />
+                        <span>VIEW CODE</span>
+                      </button>
+                    )}
+                    
+                    {project.demo && (
+                      <button
+                        onClick={() => window.open(project.demo, "_blank")}
+                        className="flex-1 py-2.5 px-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-xs rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-md flex items-center justify-center space-x-1.5"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span>LIVE DEMO</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Hover Effect Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl" />
+                </div>
+
+                {/* Corner accent */}
+                <div className="absolute top-0 right-0 w-20 h-20 opacity-20">
+                  <div className={`w-full h-full bg-gradient-to-bl ${project.color} transform rotate-45 translate-x-10 -translate-y-10`} />
+                </div>
               </div>
             ))}
           </div>
@@ -582,7 +687,7 @@ export default function Portfolio() {
                 ritikrana8596@gmail.com
               </Button>
               <a
-                href="https://drive.google.com/file/d/1CktadFnmnsr-ICtTeQLcvH61nGP37v2r/view?usp=sharing"
+                href="https://drive.google.com/file/d/1rLwOnJyQ6m9L6nfsNn00_bUpW3z97hL3/view?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-4 py-2 border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono bg-transparent hover:scale-105 transition-transform text-sm rounded-lg"
