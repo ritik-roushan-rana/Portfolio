@@ -134,7 +134,7 @@ export default function Portfolio() {
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
       github: "https://github.com/SHIELD78/VTOUR",
-      demo: "https://vtour-app-demo.netlify.app",
+      demo: "https://drive.google.com/file/d/1QyKJeWc1yVEDrFa4WhFBdcjEeyPYIWkX/view?usp=drivesdk",
     },
     {
       title: "SSH Honeypot with ELK Stack",
