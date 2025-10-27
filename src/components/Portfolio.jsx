@@ -124,7 +124,7 @@ export default function Portfolio() {
       icon: Zap,
       color: "from-yellow-500 to-orange-500",
       github: "https://github.com/ritik-roushan-rana/OptiFolio",
-      demo: "https://optifolio-demo.netlify.app",
+      demo: "https://drive.google.com/file/d/1_B-TvkwtawxcEpd7G_eS0meuNbnXG_NH/view?usp=drivesdk",
     },
     {
       title: "VTour – Virtual Campus Tour App",
