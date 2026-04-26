@@ -388,7 +388,7 @@ export default function Portfolio() {
 
                   {/* Profile Image - Using your actual photo */}
                   <img
-                    src="/images/profile-photo.jpeg"
+                    src="/profile-photo.jpeg"
                     alt="Ritik Roushan Rana - Cybersecurity Analyst"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     style={{ objectPosition: "center 20%" }}
