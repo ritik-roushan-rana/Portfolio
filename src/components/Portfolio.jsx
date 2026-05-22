@@ -22,7 +22,6 @@ import Button from "./ui/Button";
 import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import TypingEffect from "./TypingEffect";
-import profilePhoto from "../../public/profile-photo.jpeg";
 
 export default function Portfolio() {
   const [isVisible, setIsVisible] = useState(false);
@@ -389,7 +388,7 @@ export default function Portfolio() {
 
                   {/* Profile Image - Using your actual photo */}
                   <img
-                    src={profilePhoto}
+                    src="/profile-photo.jpeg"
                     alt="Ritik Roushan Rana - Cybersecurity Analyst"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     style={{ objectPosition: "center 20%" }}
