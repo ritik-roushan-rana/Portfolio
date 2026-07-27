@@ -3,16 +3,21 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Fades and slides its children up once they scroll into view.
+ * Reveals content on scroll: fade plus upward slide.
  *
- * Uses IntersectionObserver rather than a scroll handler so there is no
- * per-frame work, and disconnects after the first reveal so each section is
- * observed exactly once. Under reduced motion the content is shown immediately.
+ * With `stagger`, the wrapper itself stays put and its direct children animate
+ * in sequence instead. The per-child delays are plain nth-child rules in CSS
+ * (see globals.css), so no JS touches individual children and children can be
+ * any markup, including server components.
+ *
+ * IntersectionObserver rather than a scroll listener, disconnecting after the
+ * first reveal so each block is observed exactly once.
  */
 export default function Reveal({
   children,
   className = "",
   delay = 0,
+  stagger = false,
   as: Tag = "div",
 }) {
   const ref = useRef(null);
@@ -26,7 +31,6 @@ export default function Reveal({
       return undefined;
     }
 
-    // Already in view on load (the hero, mainly) - reveal without waiting.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -46,7 +50,7 @@ export default function Reveal({
   return (
     <Tag
       ref={ref}
-      className={`reveal ${className}`}
+      className={`${stagger ? "reveal-stagger" : "reveal"} ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}

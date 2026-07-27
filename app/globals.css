@@ -37,7 +37,13 @@
    utilities are purged unless the exact class name appears in scanned markup,
    and these rules are keyed off data attributes and parent state.
 
-   --px / --py are published by components/interactive/PointerFX.jsx.
+   components/interactive/PointerTracker.jsx publishes the eased pointer
+   position once per frame, in two forms:
+     --px / --py    viewport pixels, for the spotlight
+     --pnx / --pny  normalised -1..1 from viewport centre, for the parallax
+   One rAF loop feeds every cursor-reactive effect below.
+
+   Accent palette: #00ff41 (green) and #22d3ee (teal), matching tailwind.config.
    =========================================================================== */
 
 :root {
@@ -48,117 +54,27 @@
   --matrix-tile-hot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='%2367e8f9' font-family='monospace' font-size='12'%3E%3Ctext x='10' y='20'%3E1%3C/text%3E%3Ctext x='30' y='40'%3E0%3C/text%3E%3Ctext x='50' y='15'%3E1%3C/text%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* --- 1. Custom crosshair cursor ------------------------------------------ */
+/* --- 1. Pointer-follow spotlight + parallax ----------------------------- */
 
-/* Only hide the native cursor once PointerFX has confirmed a fine pointer and
-   mounted, so touch users and no-JS visitors keep a usable cursor.
+/* The native cursor is deliberately left alone. --px/--py (pixels) and
+   --pnx/--pny (normalised -1..1 from viewport centre) are published by
+   components/interactive/PointerTracker.jsx, already eased, so every consumer
+   below inherits the same smooth motion from a single rAF loop. */
 
-   The universal rule is necessary rather than tidy: text nodes resolve to an
-   I-beam and the cursor-pointer utility on the nav sets its own cursor, either
-   of which would draw the OS cursor alongside the reticle. */
-.has-custom-cursor,
-.has-custom-cursor body,
-.has-custom-cursor *,
-.has-custom-cursor *::before,
-.has-custom-cursor *::after {
-  cursor: none !important;
-}
-
-.cursor-reticle {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  width: 2.25rem;
-  height: 2.25rem;
-  margin: -1.125rem 0 0 -1.125rem;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate3d(var(--px, -100vw), var(--py, -100vw), 0);
-  transition: opacity 200ms ease;
+/* Profile photo drifts and tilts toward the pointer. Driven entirely by the
+   normalised vars, so there is no per-element JS and the browser only has to
+   recompose. The easing lives in the tracker's spring, giving it inertia. */
+.photo-parallax {
+  transform: perspective(900px)
+    translate3d(
+      calc(var(--pnx, 0) * 13px),
+      calc(var(--pny, 0) * 13px),
+      0
+    )
+    rotateX(calc(var(--pny, 0) * -6deg))
+    rotateY(calc(var(--pnx, 0) * 6deg));
+  transform-style: preserve-3d;
   will-change: transform;
-}
-
-.has-custom-cursor.pointer-visible .cursor-reticle {
-  opacity: 1;
-}
-
-.cursor-reticle > * {
-  position: absolute;
-  pointer-events: none;
-  transition:
-    transform 180ms ease,
-    background-color 180ms ease,
-    border-color 180ms ease,
-    opacity 180ms ease;
-}
-
-.cursor-reticle__ring {
-  inset: 0;
-  border: 1px solid rgba(34, 211, 238, 0.9);
-  border-radius: 9999px;
-}
-
-.cursor-reticle__dot {
-  top: 50%;
-  left: 50%;
-  width: 3px;
-  height: 3px;
-  margin: -1.5px 0 0 -1.5px;
-  background-color: #00ff41;
-  border-radius: 9999px;
-}
-
-.cursor-reticle__tick {
-  background-color: rgba(34, 211, 238, 0.9);
-}
-
-.cursor-reticle__tick--n,
-.cursor-reticle__tick--s {
-  left: 50%;
-  width: 1px;
-  height: 6px;
-  margin-left: -0.5px;
-}
-
-.cursor-reticle__tick--n {
-  top: -9px;
-}
-
-.cursor-reticle__tick--s {
-  bottom: -9px;
-}
-
-.cursor-reticle__tick--w,
-.cursor-reticle__tick--e {
-  top: 50%;
-  width: 6px;
-  height: 1px;
-  margin-top: -0.5px;
-}
-
-.cursor-reticle__tick--w {
-  left: -9px;
-}
-
-.cursor-reticle__tick--e {
-  right: -9px;
-}
-
-/* Grow over links, buttons and the profile photo. */
-[data-cursor="active"] .cursor-reticle__ring {
-  transform: scale(1.55);
-  border-color: #00ff41;
-  background-color: rgba(0, 255, 65, 0.08);
-}
-
-[data-cursor="active"] .cursor-reticle__tick {
-  transform: scale(1.4);
-  background-color: #00ff41;
-}
-
-[data-cursor-pressed] .cursor-reticle__ring {
-  transform: scale(1.15);
 }
 
 /* --- 5. Binary background reacting to the cursor ------------------------- */
@@ -176,9 +92,9 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 26rem;
-  height: 26rem;
-  margin: -13rem 0 0 -13rem;
+  width: 22.5rem; /* 360px */
+  height: 22.5rem;
+  margin: -11.25rem 0 0 -11.25rem;
   pointer-events: none;
   background-image: var(--matrix-tile-hot);
   background-attachment: fixed;
@@ -200,8 +116,36 @@
   );
 }
 
-.has-custom-cursor.pointer-visible .matrix-spotlight {
+/* Faded in only once the pointer has actually moved, so the spotlight does not
+   sit parked in the middle of the viewport on load. */
+.pointer-active .matrix-spotlight {
   opacity: 0.5;
+}
+
+/* A soft ambient wash under the same spotlight, lifting the whole area very
+   slightly rather than only the digits. */
+.pointer-spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 25rem;
+  height: 25rem;
+  margin: -12.5rem 0 0 -12.5rem;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(34, 211, 238, 0.09),
+    rgba(0, 255, 65, 0.05) 45%,
+    transparent 72%
+  );
+  transform: translate3d(var(--px, -100vw), var(--py, -100vw), 0);
+  transition: opacity 300ms ease;
+  will-change: transform;
+}
+
+.pointer-active .pointer-spotlight {
+  opacity: 1;
 }
 
 /* --- 2. Typewriter caret ------------------------------------------------- */
@@ -227,18 +171,7 @@
   }
 }
 
-/* --- 3. Profile photo tilt + radar sweep -------------------------------- */
-
-.tilt {
-  perspective: 900px;
-}
-
-.tilt__inner {
-  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transform-style: preserve-3d;
-  transition: transform 220ms ease-out;
-  will-change: transform;
-}
+/* --- 3. Profile photo radar sweep --------------------------------------- */
 
 /* Radar sweep travelling around the ring. The conic gradient supplies the
    comet tail; the radial mask cuts it down to an annulus. */
@@ -434,7 +367,6 @@
     animation: none;
   }
 
-  .tilt__inner,
   .magnetic {
     transform: none !important;
     transition: none;
@@ -443,12 +375,480 @@
   .magnetic__ripple {
     display: none;
   }
-}
 
-/* Cursor-driven effects have nothing to follow without a hovering pointer. */
-@media (hover: none), (pointer: coarse) {
-  .cursor-reticle,
+  /* Hold the photo still rather than letting it rest at a tilted angle. */
+  .photo-parallax {
+    transform: none;
+  }
+
+  .pointer-spotlight,
   .matrix-spotlight {
     display: none;
+  }
+}
+
+/* Cursor-driven effects have nothing to follow without a hovering pointer.
+   PointerTracker also bails out in JS; this is the CSS belt to that braces. */
+@media (hover: none), (pointer: coarse) {
+  .pointer-spotlight,
+  .matrix-spotlight {
+    display: none;
+  }
+
+  .photo-parallax {
+    transform: none;
+  }
+}
+
+/* ===========================================================================
+   Cinematic scroll layer
+   ---------------------------------------------------------------------------
+   Preloader, section dots, staggered reveals, project preview reveal, marquee.
+   Transform/opacity only. Palette unchanged: #00ff41, #22d3ee, black ground.
+   =========================================================================== */
+
+/* --- 1. Preloader -------------------------------------------------------- */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+  opacity: 1;
+  transition:
+    opacity 520ms ease,
+    visibility 520ms ease;
+  /* Failsafe: clears itself even if the component never runs, so a script
+     error cannot leave the page covered. Far longer than the JS path needs. */
+  animation: preloader-failsafe 1ms linear 8s forwards;
+}
+
+.preloader--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes preloader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.preloader__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.preloader__count {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(3.5rem, 12vw, 7rem);
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  /* Tabular figures stop the counter jittering as digits change width. */
+  font-variant-numeric: tabular-nums;
+}
+
+.preloader__pct {
+  margin-left: 0.15em;
+  font-size: 0.32em;
+  color: #00ff41;
+  vertical-align: super;
+}
+
+.preloader__track {
+  position: relative;
+  display: block;
+  width: min(16rem, 60vw);
+  height: 1px;
+  overflow: hidden;
+  background-color: rgba(34, 211, 238, 0.2);
+}
+
+.preloader__bar {
+  display: block;
+  height: 100%;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #00ff41, #22d3ee);
+}
+
+/* The hero's own entrance is driven by its existing Tailwind transition
+   classes, gated on useAppReady() so it plays as the overlay clears. */
+
+/* --- 2. Section dot navigation ------------------------------------------ */
+
+.section-dots {
+  position: fixed;
+  top: 50%;
+  right: 1.25rem;
+  z-index: 55;
+  transform: translateY(-50%);
+}
+
+.section-dots__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section-dots__item {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.section-dots__dot {
+  position: relative;
+  display: block;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  border-radius: 9999px;
+  background-color: transparent;
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.section-dots__dot:hover,
+.section-dots__dot:focus-visible {
+  border-color: #00ff41;
+  transform: scale(1.35);
+}
+
+.section-dots__dot--active {
+  background-color: #00ff41;
+  border-color: #00ff41;
+  transform: scale(1.55);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+}
+
+/* Label sits to the left of its dot and only appears on hover/focus. */
+.section-dots__label {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.75rem);
+  transform: translate3d(6px, -50%, 0);
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 0.25rem;
+  background-color: rgba(3, 7, 18, 0.92);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #22d3ee;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 220ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section-dots__dot:hover .section-dots__label,
+.section-dots__dot:focus-visible .section-dots__label {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0);
+}
+
+/* Tighter on small screens rather than removed, so the affordance survives. */
+@media (max-width: 640px) {
+  .section-dots {
+    right: 0.6rem;
+  }
+
+  .section-dots__list {
+    gap: 0.7rem;
+  }
+
+  .section-dots__dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .section-dots__label {
+    display: none;
+  }
+}
+
+/* --- 4. Staggered section reveals --------------------------------------- */
+
+/* The wrapper holds still and its direct children cascade. Delays are
+   nth-child rules so no JS has to touch individual children. */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 620ms ease,
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.reveal-stagger.is-revealed > * {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger > *:nth-child(1) {
+  transition-delay: 0ms;
+}
+.reveal-stagger > *:nth-child(2) {
+  transition-delay: 80ms;
+}
+.reveal-stagger > *:nth-child(3) {
+  transition-delay: 160ms;
+}
+.reveal-stagger > *:nth-child(4) {
+  transition-delay: 240ms;
+}
+.reveal-stagger > *:nth-child(5) {
+  transition-delay: 320ms;
+}
+.reveal-stagger > *:nth-child(6) {
+  transition-delay: 400ms;
+}
+.reveal-stagger > *:nth-child(7) {
+  transition-delay: 480ms;
+}
+.reveal-stagger > *:nth-child(8) {
+  transition-delay: 560ms;
+}
+
+/* --- 3. Project preview reveal ----------------------------------------- */
+
+.project-card__media {
+  cursor: pointer;
+}
+
+.project-card__preview,
+.project-card__wash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 360ms ease;
+  pointer-events: none;
+}
+
+.project-card__wash {
+  opacity: 0;
+  transition: opacity 360ms ease;
+}
+
+.project-card__preview-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Slide-up panel carrying the stack and the view link. */
+.project-card__overlay {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.7rem;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92),
+    rgba(0, 0, 0, 0.55) 65%,
+    transparent
+  );
+  transform: translateY(101%);
+  opacity: 0;
+  transition:
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 300ms ease;
+}
+
+.project-card__overlay-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.project-card__chip {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 9999px;
+  background-color: rgba(3, 7, 18, 0.7);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  color: #22d3ee;
+  white-space: nowrap;
+}
+
+.project-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.375rem;
+  background-color: #00ff41;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #000000;
+  transition: filter 200ms ease;
+}
+
+.project-card__cta:hover {
+  filter: brightness(1.15);
+}
+
+/* Fade the placeholder glyph out as the real preview comes in. */
+.project-card__glyph {
+  transition: opacity 320ms ease;
+}
+
+/* Touch: driven by the data attribute this component toggles. */
+.project-card[data-open="true"] .project-card__preview,
+.project-card[data-open="true"] .project-card__wash {
+  opacity: 1;
+}
+
+.project-card[data-open="true"] .project-card__preview-media {
+  transform: scale(1);
+}
+
+.project-card[data-open="true"] .project-card__overlay {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.project-card[data-open="true"] .project-card__preview + .project-card__glyph,
+.project-card[data-open="true"] .project-card__glyph {
+  opacity: 0.25;
+}
+
+/* Pointer devices only, so touch never inherits sticky hover states. */
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover .project-card__preview,
+  .project-card:hover .project-card__wash {
+    opacity: 1;
+  }
+
+  .project-card:hover .project-card__wash {
+    opacity: 0.28;
+  }
+
+  .project-card:hover .project-card__preview-media {
+    transform: scale(1);
+  }
+
+  .project-card:hover .project-card__overlay {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .project-card:hover .project-card__glyph {
+    opacity: 0.25;
+  }
+}
+
+/* --- 5. Tools marquee --------------------------------------------------- */
+
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation-name: marquee-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.marquee__sep {
+  margin: 0 1.6rem;
+  color: #00ff41;
+}
+
+/* List is rendered twice, so -50% lands copy two exactly where copy one
+   began - no seam. */
+@keyframes marquee-scroll {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+
+/* --- Reduced motion ----------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader {
+    display: none;
+  }
+
+  .reveal-stagger > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .marquee__track {
+    animation: none;
+  }
+
+  .project-card__preview,
+  .project-card__wash,
+  .project-card__overlay,
+  .project-card__preview-media,
+  .project-card__glyph {
+    transition: none;
+  }
+
+  .section-dots__dot,
+  .section-dots__label {
+    transition: none;
   }
 }
