@@ -4,9 +4,28 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'Ritik Roushan Rana | Cybersecurity Analyst & CSE Student',
+  description:
+    'Portfolio of Ritik Roushan Rana, a Computer Science student at VIT Vellore and IBM Cyber Security Analyst intern, building mobile and frontend applications.',
+  keywords: [
+    'Ritik Roushan Rana',
+    'cybersecurity',
+    'portfolio',
+    'Flutter',
+    'Next.js',
+    'VIT Vellore',
+  ],
+  authors: [{ name: 'Ritik Roushan Rana' }],
+  metadataBase: new URL('https://ritikrana-me.vercel.app'),
+  openGraph: {
+    title: 'Ritik Roushan Rana | Cybersecurity Analyst & CSE Student',
+    description:
+      'Portfolio of Ritik Roushan Rana, a Computer Science student at VIT Vellore and IBM Cyber Security Analyst intern.',
+    url: 'https://ritikrana-me.vercel.app/',
+    siteName: 'Ritik Roushan Rana',
+    images: ['/preview.png'],
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
@@ -15,16 +34,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
-        `}</style>
-      </head>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
       <body>{children}</body>
     </html>
   )

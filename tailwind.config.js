@@ -1,8 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx}", "*.{js,ts,jsx,tsx,mdx}"],
+  content: ["./app/**/*.{js,jsx,ts,tsx,mdx}", "./components/**/*.{js,jsx,ts,tsx,mdx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
+      },
       colors: {
         border: "#333333",
         input: "#333333",
@@ -30,8 +34,8 @@ module.exports = {
           foreground: "#000000",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#1a1a1a",
+          foreground: "#ffffff",
         },
         card: {
           DEFAULT: "#1a1a1a",
@@ -44,13 +48,15 @@ module.exports = {
         sm: "calc(0.5rem - 4px)",
       },
       animation: {
+        "fade-in": "fade-in 0.8s ease-out both",
         gradient: "gradient 3s ease infinite",
         scan: "scan 3s infinite",
-        float: "float 3s ease-in-out infinite",
-        "float-reverse": "float-reverse 4s ease-in-out infinite",
-        "float-slow": "float-slow 3.5s ease-in-out infinite",
       },
       keyframes: {
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
         gradient: {
           "0%, 100%": { "background-position": "0% 50%" },
           "50%": { "background-position": "100% 50%" },
@@ -59,20 +65,6 @@ module.exports = {
           "0%": { transform: "translateY(-100%)", opacity: "0" },
           "50%": { opacity: "1" },
           "100%": { transform: "translateY(320px)", opacity: "0" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
-          "33%": { transform: "translateY(-10px) rotate(5deg)" },
-          "66%": { transform: "translateY(5px) rotate(-3deg)" },
-        },
-        "float-reverse": {
-          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
-          "33%": { transform: "translateY(10px) rotate(-5deg)" },
-          "66%": { transform: "translateY(-5px) rotate(3deg)" },
-        },
-        "float-slow": {
-          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
-          "50%": { transform: "translateY(-8px) rotate(3deg)" },
         },
       },
     },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Shield,
   Terminal,
@@ -19,7 +20,6 @@ import {
   Phone,
 } from "lucide-react";
 import Button from "./ui/Button";
-import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import TypingEffect from "./TypingEffect";
 
@@ -197,7 +197,7 @@ export default function Portfolio() {
       <div className="fixed inset-0 opacity-10">
         <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-black to-cyan-900/20" />
         <div
-          className="matrix-bg absolute inset-0"
+          className="absolute inset-0"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%2300ff41' fillOpacity='0.1'%3E%3Ctext x='10' y='20' fontFamily='monospace' fontSize='12'%3E1%3C/text%3E%3Ctext x='30' y='40' fontFamily='monospace' fontSize='12'%3E0%3C/text%3E%3Ctext x='50' y='15' fontFamily='monospace' fontSize='12'%3E1%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
@@ -258,7 +258,7 @@ export default function Portfolio() {
                 </h1>
 
                 <h2 className="text-4xl lg:text-6xl font-bold">
-                  I'm{" "}
+                  I&apos;m{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-green-400 animate-gradient font-black uppercase tracking-wider">
                     RITIK ROUSHAN RANA
                   </span>
@@ -386,11 +386,14 @@ export default function Portfolio() {
                   {/* Scanning line effect */}
                   <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan" />
 
-                  {/* Profile Image - Using your actual photo */}
-                  <img
+                  {/* Profile Image */}
+                  <Image
                     src="/profile-photo.jpeg"
                     alt="Ritik Roushan Rana - Cybersecurity Analyst"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    fill
+                    priority
+                    sizes="384px"
+                    className="object-cover hover:scale-105 transition-transform duration-500"
                     style={{ objectPosition: "center 20%" }}
                   />
 
@@ -668,12 +671,12 @@ export default function Portfolio() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-12 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300">
             <h2 className="text-4xl font-bold text-white mb-4 font-mono">
-              <span className="text-cyan-400">&gt;</span> Let's Connect &
+              <span className="text-cyan-400">&gt;</span> Let&apos;s Connect &amp;
               Collaborate
             </h2>
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto font-mono">
-              Ready to discuss projects, opportunities, or just connect? Let's
-              build something amazing together.
+              Ready to discuss projects, opportunities, or just connect?
+              Let&apos;s build something amazing together.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
