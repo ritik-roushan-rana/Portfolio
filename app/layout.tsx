@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import PointerFX from '@/components/interactive/PointerFX'
+import ScrollProgress from '@/components/interactive/ScrollProgress'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -38,7 +40,11 @@ export default function RootLayout({
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <ScrollProgress />
+        <PointerFX />
+        {children}
+      </body>
     </html>
   )
 }

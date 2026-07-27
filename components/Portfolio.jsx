@@ -22,11 +22,16 @@ import {
 import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import TypingEffect from "./TypingEffect";
+import MagneticButton from "./interactive/MagneticButton";
+import Reveal from "./interactive/Reveal";
+import TiltCard from "./interactive/TiltCard";
+import useScrolled from "./interactive/useScrolled";
 
 export default function Portfolio() {
   const [isVisible, setIsVisible] = useState(false);
   const [expandedTech, setExpandedTech] = useState({});
   const [expandedDesc, setExpandedDesc] = useState({});
+  const isScrolled = useScrolled(40);
 
   useEffect(() => {
     setIsVisible(true);
@@ -194,23 +199,28 @@ export default function Portfolio() {
   return (
     <div className="min-h-screen bg-black text-green-400 relative overflow-hidden">
       {/* Matrix Background Effect */}
-      <div className="fixed inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-black to-cyan-900/20" />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%2300ff41' fillOpacity='0.1'%3E%3Ctext x='10' y='20' fontFamily='monospace' fontSize='12'%3E1%3C/text%3E%3Ctext x='30' y='40' fontFamily='monospace' fontSize='12'%3E0%3C/text%3E%3Ctext x='50' y='15' fontFamily='monospace' fontSize='12'%3E1%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
+      <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-black to-cyan-900/20" />
+          <div className="matrix-field" />
+        </div>
+        {/* Brighter digits tracking the cursor (see globals.css) */}
+        <div className="matrix-spotlight" />
       </div>
 
       {/* Navigation */}
       <nav
-        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ${
+        className={`site-nav fixed left-1/2 z-50 transform -translate-x-1/2 transition-all duration-500 ${
+          isScrolled ? "site-nav--condensed top-3 scale-95" : "top-6 scale-100"
+        } ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
         }`}
       >
-        <div className="bg-gray-900/80 backdrop-blur-md border border-cyan-500/30 rounded-full px-8 py-3">
+        <div
+          className={`site-nav__shell bg-gray-900/80 backdrop-blur-md border border-cyan-500/30 rounded-full ${
+            isScrolled ? "px-6 py-2" : "px-8 py-3"
+          }`}
+        >
           <div className="flex space-x-8">
             {[
               { icon: Shield, label: "Home", target: "home" },
@@ -300,23 +310,23 @@ export default function Portfolio() {
               </div>
 
               <div className="flex flex-wrap gap-4">
-                <Button
+                <MagneticButton
                   size="lg"
                   onClick={() => handleNavClick("projects")}
-                  className="bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-700 hover:to-cyan-700 text-black font-semibold border-0 hover:scale-105 transition-transform"
+                  className="bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-700 hover:to-cyan-700 text-black font-semibold border-0"
                 >
                   <Eye className="mr-2 h-4 w-4" />
                   View Projects
-                </Button>
-                <Button
+                </MagneticButton>
+                <MagneticButton
                   variant="outline"
                   size="lg"
                   onClick={() => handleNavClick("contact")}
-                  className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 bg-transparent hover:scale-105 transition-transform"
+                  className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 bg-transparent"
                 >
                   <Shield className="mr-2 h-4 w-4" />
                   Contact Me
-                </Button>
+                </MagneticButton>
               </div>
 
               <div className="flex space-x-6">
@@ -324,22 +334,26 @@ export default function Portfolio() {
                   {
                     icon: Github,
                     href: "https://github.com/SHIELD78",
-                    color: "hover:text-white",
+                    label: "GitHub",
+                    glow: "social-link--github",
                   },
                   {
                     icon: Linkedin,
                     href: "https://www.linkedin.com/in/ritik-roushan-rana-b6a89528a/",
-                    color: "hover:text-blue-400",
+                    label: "LinkedIn",
+                    glow: "social-link--linkedin",
                   },
                   {
                     icon: Mail,
                     href: "mailto:ritikrana8596@gmail.com",
-                    color: "hover:text-green-400",
+                    label: "Email",
+                    glow: "social-link--mail",
                   },
-                ].map((social, index) => (
+                ].map((social) => (
                   <a
-                    key={index}
+                    key={social.label}
                     href={social.href}
+                    aria-label={social.label}
                     target={
                       social.href.startsWith("mailto:") ? "_self" : "_blank"
                     }
@@ -348,7 +362,7 @@ export default function Portfolio() {
                         ? ""
                         : "noopener noreferrer"
                     }
-                    className={`text-gray-400 ${social.color} transition-all duration-200 hover:scale-125 hover:rotate-12`}
+                    className={`social-link ${social.glow} text-gray-400 hover:scale-125 hover:rotate-12`}
                   >
                     <social.icon className="h-6 w-6" />
                   </a>
@@ -362,12 +376,15 @@ export default function Portfolio() {
                 isVisible ? "opacity-100 scale-100" : "opacity-0 scale-75"
               }`}
             >
-              <div className="relative">
+              <TiltCard className="relative" data-cursor-target="">
                 {/* Outer rotating ring */}
                 <div
                   className="absolute -inset-6 rounded-full border-2 border-cyan-500/30 animate-spin"
                   style={{ animationDuration: "20s" }}
                 />
+
+                {/* Radar sweep travelling around the outer ring */}
+                <div className="profile-radar" />
 
                 {/* Middle pulsing ring */}
                 <div className="absolute -inset-4 rounded-full border border-green-500/50 bg-green-500/5 animate-pulse" />
@@ -408,13 +425,16 @@ export default function Portfolio() {
                 <div className="absolute -bottom-3 -right-3 w-8 h-8 border-r-2 border-b-2 border-cyan-400 animate-pulse" />
 
                 {/* Status indicator */}
-                <div className="absolute -bottom-2 -right-2 flex items-center space-x-1 bg-gray-900 border border-green-500 rounded-full px-3 py-2 animate-pulse">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
+                <div className="status-live absolute -bottom-2 -right-2 flex items-center space-x-1 bg-gray-900 border border-green-500 rounded-full px-3 py-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
                   <span className="text-green-400 text-sm font-mono">
                     ONLINE
                   </span>
                 </div>
-              </div>
+              </TiltCard>
 
               {/* Floating badges */}
               <div
@@ -453,7 +473,7 @@ export default function Portfolio() {
 
       {/* Skills Section */}
       <section id="skills" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-cyan-400">&gt;</span> Skills
@@ -493,12 +513,12 @@ export default function Portfolio() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Projects Section */}
       <section id="projects" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-green-400">&gt;</span> Projects
@@ -620,11 +640,11 @@ export default function Portfolio() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
       {/* Experience Section */}
       <section id="experience" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-red-400">&gt;</span> Experience & Education
@@ -663,12 +683,12 @@ export default function Portfolio() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Contact Section */}
       <section id="contact" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-12 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300">
             <h2 className="text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-cyan-400">&gt;</span> Let&apos;s Connect &amp;
@@ -700,7 +720,7 @@ export default function Portfolio() {
               </a>
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Footer */}
