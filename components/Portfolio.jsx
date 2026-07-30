@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import {
   Shield,
   Terminal,
-  Lock,
   Eye,
   Bug,
   Github,
@@ -24,6 +22,7 @@ import TypingEffect from "./TypingEffect";
 import MagneticButton from "./interactive/MagneticButton";
 import Reveal from "./interactive/Reveal";
 import useScrolled from "./interactive/useScrolled";
+import HeroPortrait from "./HeroPortrait";
 import Marquee from "./interactive/Marquee";
 import ProjectCard from "./interactive/ProjectCard";
 import SectionDots from "./interactive/SectionDots";
@@ -126,6 +125,12 @@ export default function Portfolio() {
       description:
         "Reinforcement Learning-driven portfolio rebalancer using Deep Q-Learning to optimize rebalancing policies from historical market data. Maximizes risk-adjusted returns while respecting user risk profiles and transaction costs. Features Flutter iOS app for goal setting, backtesting on ETFs/stocks, and actionable rebalancing suggestions with performance visualization.",
       tech: ["Python", "PyTorch", "Stable-Baselines3", "Flutter", "Express.js", "MongoDB", "Yahoo Finance API", "Quandl", "Matplotlib", "Plotly"],
+      // Falls back to the placeholder artwork if the file is missing.
+      preview: "/projects/optifolio.png",
+      // 418x878 phone capture. At the standard 9/4 banner this centres the
+      // "$1,187,543 / +1.4% this year" block at 28%-72% of the banner height,
+      // clear of both the top edge and the bottom fade.
+      previewPosition: "center 19%",
       icon: Zap,
       color: "from-yellow-500 to-orange-500",
       github: "https://github.com/ritik-roushan-rana/OptiFolio",
@@ -136,6 +141,7 @@ export default function Portfolio() {
       description:
         "Built a mobile app to guide students through virtual campus tours using Flutter. Designed intuitive UI/UX for a smooth and interactive navigation experience. Provided students with easy access to campus maps, departments, and facility information.",
       tech: ["Flutter", "Supabase", "UI/UX", "IOS Development"],
+      // Add preview: "/projects/vtour.png" once the screenshot exists.
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
       github: "https://github.com/SHIELD78/VTOUR",
@@ -383,101 +389,14 @@ export default function Portfolio() {
               </div>
             </div>
 
-            {/* Profile Photo with Cyber Effects */}
+            {/* Hero identity card */}
             <div
               className={`relative flex justify-center transition-all duration-1000 delay-300 ${
-                isVisible ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
               }`}
             >
-              <div className="photo-parallax relative">
-                {/* Outer rotating ring */}
-                <div
-                  className="absolute -inset-6 rounded-full border-2 border-cyan-500/30 animate-spin"
-                  style={{ animationDuration: "20s" }}
-                />
-
-                {/* Radar sweep travelling around the outer ring */}
-                <div className="profile-radar" />
-
-                {/* Middle pulsing ring */}
-                <div className="absolute -inset-4 rounded-full border border-green-500/50 bg-green-500/5 animate-pulse" />
-
-                {/* Secondary rotating ring */}
-                <div
-                  className="absolute -inset-2 rounded-full border border-cyan-400/20 animate-spin"
-                  style={{
-                    animationDuration: "15s",
-                    animationDirection: "reverse",
-                  }}
-                />
-
-                {/* Inner glowing border */}
-                <div className="relative w-96 h-96 rounded-full overflow-hidden border-2 border-cyan-400 shadow-2xl shadow-cyan-500/50">
-                  {/* Scanning line effect */}
-                  <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan" />
-
-                  {/* Profile Image */}
-                  <Image
-                    src="/profile-photo.jpeg"
-                    alt="Ritik Roushan Rana - Cybersecurity Analyst"
-                    fill
-                    priority
-                    sizes="384px"
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                    style={{ objectPosition: "center 20%" }}
-                  />
-
-                  {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                </div>
-
-                {/* Corner brackets for tech aesthetic */}
-                <div className="absolute -top-3 -left-3 w-8 h-8 border-l-2 border-t-2 border-cyan-400 animate-pulse" />
-                <div className="absolute -top-3 -right-3 w-8 h-8 border-r-2 border-t-2 border-cyan-400 animate-pulse" />
-                <div className="absolute -bottom-3 -left-3 w-8 h-8 border-l-2 border-b-2 border-cyan-400 animate-pulse" />
-                <div className="absolute -bottom-3 -right-3 w-8 h-8 border-r-2 border-b-2 border-cyan-400 animate-pulse" />
-
-                {/* Status indicator */}
-                <div className="status-live absolute -bottom-2 -right-2 flex items-center space-x-1 bg-gray-900 border border-green-500 rounded-full px-3 py-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-                  </span>
-                  <span className="text-green-400 text-sm font-mono">
-                    ONLINE
-                  </span>
-                </div>
-              </div>
-
-              {/* Floating badges */}
-              <div
-                className="absolute -top-12 -right-6 bg-gray-900/80 border border-red-500/50 rounded-lg px-3 py-2 animate-bounce"
-                style={{ animationDuration: "3s" }}
-              >
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-red-400" />
-                  <span className="text-red-400 text-sm font-mono">IBM</span>
-                </div>
-              </div>
-
-              <div
-                className="absolute -bottom-12 -left-6 bg-gray-900/80 border border-blue-500/50 rounded-lg px-3 py-2 animate-bounce"
-                style={{ animationDuration: "4s", animationDelay: "1s" }}
-              >
-                <div className="flex items-center space-x-2">
-                  <Bug className="w-4 h-4 text-blue-400" />
-                  <span className="text-blue-400 text-sm font-mono">VIT</span>
-                </div>
-              </div>
-
-              <div
-                className="absolute top-4 -left-8 bg-gray-900/80 border border-green-500/50 rounded-lg px-3 py-2 animate-bounce"
-                style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}
-              >
-                <div className="flex items-center space-x-2">
-                  <Lock className="w-4 h-4 text-green-400" />
-                  <span className="text-green-400 text-sm font-mono">CSE</span>
-                </div>
+              <div className="w-full">
+                <HeroPortrait />
               </div>
             </div>
           </div>

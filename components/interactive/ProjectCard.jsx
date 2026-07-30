@@ -26,6 +26,7 @@ export default function ProjectCard({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
+  const [bannerFailed, setBannerFailed] = useState(false);
 
   useEffect(() => {
     setIsTouch(!window.matchMedia("(hover: hover)").matches);
@@ -38,7 +39,11 @@ export default function ProjectCard({
   }, [isTouch]);
 
   const primaryLink = project.demo || project.github;
-  const hasMedia = Boolean(project.preview || project.previewVideo);
+  // If the file is missing the request errors and the card falls back to its
+  // placeholder artwork, rather than showing a broken image.
+  const hasBanner = Boolean(
+    (project.preview || project.previewVideo) && !bannerFailed
+  );
 
   return (
     <div
@@ -47,7 +52,7 @@ export default function ProjectCard({
     >
       {/* Project Preview/Header */}
       <div
-        className="project-card__media relative h-36 bg-gradient-to-br from-gray-900 to-black overflow-hidden"
+        className="project-card__media relative bg-gradient-to-br from-gray-900 to-black overflow-hidden"
         onClick={handleMediaClick}
         role={isTouch ? "button" : undefined}
         tabIndex={isTouch ? 0 : undefined}
@@ -63,14 +68,64 @@ export default function ProjectCard({
             : undefined
         }
       >
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-15">
-          <div
-            className={`w-full h-full bg-gradient-to-r ${project.color} opacity-20`}
-          />
-        </div>
+        {hasBanner ? (
+          <>
+            {/* Screenshot banner filling the header */}
+            <div className="project-card__banner">
+              {project.previewVideo ? (
+                <video
+                  className="project-card__banner-media"
+                  src={project.previewVideo}
+                  muted
+                  loop
+                  playsInline
+                  preload="none"
+                  poster={project.preview}
+                  onError={() => setBannerFailed(true)}
+                />
+              ) : (
+                <Image
+                  src={project.preview}
+                  alt={`${project.title} screenshot`}
+                  fill
+                  sizes="(max-width: 768px) 90vw, 420px"
+                  className="project-card__banner-media object-cover"
+                  // Tall phone screenshots crop to a thin slice in a wide
+                  // banner, so each project can name its own focal point.
+                  style={
+                    project.previewPosition
+                      ? { objectPosition: project.previewPosition }
+                      : undefined
+                  }
+                  onError={() => setBannerFailed(true)}
+                />
+              )}
+            </div>
 
-        {/* Floating Tech Icons */}
+            {/* Sinks the lower edge into the card body, so the banner has no
+                hard cut-off against the title block. */}
+            <div className="project-card__banner-fade" aria-hidden="true" />
+          </>
+        ) : (
+          <>
+            {/* Placeholder artwork, used until a screenshot is supplied */}
+            <div className="absolute inset-0 opacity-15">
+              <div
+                className={`w-full h-full bg-gradient-to-r ${project.color} opacity-20`}
+              />
+            </div>
+
+            {/* Grid Pattern Overlay */}
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ff41' fill-opacity='0.1'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M0 30h60M30 0v60' stroke='%2300ff41' stroke-width='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+          </>
+        )}
+
+        {/* Icon badge, kept above the banner with its drop-shadow */}
         <div className="project-card__glyph absolute inset-0 flex items-center justify-center">
           <div className="relative">
             <div
@@ -84,46 +139,6 @@ export default function ProjectCard({
             <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
           </div>
         </div>
-
-        {/* Grid Pattern Overlay */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ff41' fill-opacity='0.1'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M0 30h60M30 0v60' stroke='%2300ff41' stroke-width='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-
-        {/* Preview media, revealed on hover/tap */}
-        {hasMedia && (
-          <div className="project-card__preview">
-            {project.previewVideo ? (
-              <video
-                className="project-card__preview-media"
-                src={project.previewVideo}
-                muted
-                loop
-                playsInline
-                preload="none"
-                poster={project.preview}
-              />
-            ) : (
-              <Image
-                src={project.preview}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 90vw, 420px"
-                className="project-card__preview-media object-cover"
-              />
-            )}
-          </div>
-        )}
-
-        {/* Wash that lifts the artwork when no screenshot is supplied */}
-        {!hasMedia && (
-          <div
-            className={`project-card__wash bg-gradient-to-br ${project.color}`}
-          />
-        )}
 
         {/* Slide-up overlay: tech stack + view link */}
         <div className="project-card__overlay">

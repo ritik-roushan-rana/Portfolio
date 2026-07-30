@@ -57,25 +57,8 @@
 /* --- 1. Pointer-follow spotlight + parallax ----------------------------- */
 
 /* The native cursor is deliberately left alone. --px/--py (pixels) and
-   --pnx/--pny (normalised -1..1 from viewport centre) are published by
    components/interactive/PointerTracker.jsx, already eased, so every consumer
    below inherits the same smooth motion from a single rAF loop. */
-
-/* Profile photo drifts and tilts toward the pointer. Driven entirely by the
-   normalised vars, so there is no per-element JS and the browser only has to
-   recompose. The easing lives in the tracker's spring, giving it inertia. */
-.photo-parallax {
-  transform: perspective(900px)
-    translate3d(
-      calc(var(--pnx, 0) * 13px),
-      calc(var(--pny, 0) * 13px),
-      0
-    )
-    rotateX(calc(var(--pny, 0) * -6deg))
-    rotateY(calc(var(--pnx, 0) * 6deg));
-  transform-style: preserve-3d;
-  will-change: transform;
-}
 
 /* --- 5. Binary background reacting to the cursor ------------------------- */
 
@@ -376,10 +359,6 @@
     display: none;
   }
 
-  /* Hold the photo still rather than letting it rest at a tilted angle. */
-  .photo-parallax {
-    transform: none;
-  }
 
   .pointer-spotlight,
   .matrix-spotlight {
@@ -395,9 +374,6 @@
     display: none;
   }
 
-  .photo-parallax {
-    transform: none;
-  }
 }
 
 /* ===========================================================================
@@ -630,33 +606,49 @@
 
 /* --- 3. Project preview reveal ----------------------------------------- */
 
+/* One banner geometry for every card, so a new screenshot needs no per-card
+   fixes: fixed aspect ratio, cover-cropped, biased to the top, and inset from
+   the card's rounded corners so image content is never flush to the edge. */
 .project-card__media {
   cursor: pointer;
+  aspect-ratio: 9 / 4;
+  height: auto;
+  padding: 0.5rem;
 }
 
-.project-card__preview,
-.project-card__wash {
+/* Screenshot banner. Sits under the icon badge and the slide-up overlay. */
+.project-card__banner {
   position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 360ms ease;
-  pointer-events: none;
+  /* Matches .project-card__media padding, giving the image breathing room. */
+  inset: 0.5rem;
+  overflow: hidden;
+  border-radius: 0.25rem;
 }
 
-.project-card__wash {
-  opacity: 0;
-  transition: opacity 360ms ease;
-}
-
-.project-card__preview-media {
+.project-card__banner-media {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.06);
-  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Top-biased default: headers and titles are what identify a screenshot.
+     Individual projects can override via the previewPosition field. */
+  object-position: center top;
+  transform: scale(1);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Slide-up panel carrying the stack and the view link. */
+/* Fades the image into the card body so the banner has no hard bottom edge. */
+.project-card__banner-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(3, 7, 18, 0.96) 0%,
+    rgba(3, 7, 18, 0.6) 10%,
+    transparent 30%
+  );
+}
+
 .project-card__overlay {
   position: absolute;
   inset-inline: 0;
@@ -716,52 +708,31 @@
 }
 
 /* Fade the placeholder glyph out as the real preview comes in. */
+/* Badge keeps its drop-shadow above the banner at all times. */
 .project-card__glyph {
-  transition: opacity 320ms ease;
+  z-index: 2;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.75));
 }
 
 /* Touch: driven by the data attribute this component toggles. */
-.project-card[data-open="true"] .project-card__preview,
-.project-card[data-open="true"] .project-card__wash {
-  opacity: 1;
-}
-
-.project-card[data-open="true"] .project-card__preview-media {
-  transform: scale(1);
-}
-
 .project-card[data-open="true"] .project-card__overlay {
   transform: translateY(0);
   opacity: 1;
 }
 
-.project-card[data-open="true"] .project-card__preview + .project-card__glyph,
-.project-card[data-open="true"] .project-card__glyph {
-  opacity: 0.25;
+.project-card[data-open="true"] .project-card__banner-media {
+  transform: scale(1.05);
 }
 
 /* Pointer devices only, so touch never inherits sticky hover states. */
 @media (hover: hover) and (pointer: fine) {
-  .project-card:hover .project-card__preview,
-  .project-card:hover .project-card__wash {
-    opacity: 1;
-  }
-
-  .project-card:hover .project-card__wash {
-    opacity: 0.28;
-  }
-
-  .project-card:hover .project-card__preview-media {
-    transform: scale(1);
+  .project-card:hover .project-card__banner-media {
+    transform: scale(1.05);
   }
 
   .project-card:hover .project-card__overlay {
     transform: translateY(0);
     opacity: 1;
-  }
-
-  .project-card:hover .project-card__glyph {
-    opacity: 0.25;
   }
 }
 
@@ -839,16 +810,170 @@
     animation: none;
   }
 
-  .project-card__preview,
-  .project-card__wash,
   .project-card__overlay,
-  .project-card__preview-media,
-  .project-card__glyph {
+  .project-card__banner-media {
     transition: none;
   }
 
   .section-dots__dot,
   .section-dots__label {
     transition: none;
+  }
+}
+
+/* ===========================================================================
+   Hero portrait (components/HeroPortrait.jsx)
+   ---------------------------------------------------------------------------
+   Minimal editorial treatment: duotone portrait, no rotation, no frame chrome.
+   Strictly grayscale - the green/cyan accent stays reserved for links and
+   buttons, so the photo and its accents carry contrast instead of colour.
+   =========================================================================== */
+
+.portrait {
+  /* Focal point held fixed while zooming, and the zoom that pulls a chest-up
+     crop out of a wider shot. Nudge these two to reframe. */
+  --portrait-focus: 64% 56%;
+  --portrait-zoom: 2.05;
+
+  position: relative;
+  width: clamp(15rem, 62vw, 26rem);
+  /* Negative space around the portrait rather than decoration up against it. */
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+}
+
+.portrait__frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background-color: #050505;
+}
+
+.portrait__img {
+  object-fit: cover;
+  object-position: var(--portrait-focus);
+  transform: scale(var(--portrait-zoom));
+  transform-origin: var(--portrait-focus);
+  /* Full desaturation, then crushed blacks and lifted off-white highlights. */
+  filter: grayscale(1) contrast(1.32) brightness(1.04);
+}
+
+/* Deepens the shadows further and dissolves the bottom edge into the page, so
+   the crop ends in negative space rather than on a hard line. */
+.portrait__levels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.55) 14%, transparent 42%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 30%);
+}
+
+/* --- Geometric accents --------------------------------------------------- */
+
+.portrait__sq {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Hollow outlines */
+.portrait__sq--a,
+.portrait__sq--c,
+.portrait__sq--e {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* Solid muted-gray fills */
+.portrait__sq--b,
+.portrait__sq--d,
+.portrait__sq--f {
+  background-color: rgba(148, 163, 184, 0.16);
+}
+
+/* Placed along the edges and clear of the centre, where the face sits. */
+.portrait__sq--a {
+  top: 0.5rem;
+  left: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.portrait__sq--b {
+  top: 2.75rem;
+  left: 1.4rem;
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.portrait__sq--c {
+  top: 1.25rem;
+  right: 0.4rem;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.portrait__sq--d {
+  bottom: 3.25rem;
+  right: 0.3rem;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.portrait__sq--e {
+  bottom: 0.75rem;
+  right: 2.1rem;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.portrait__sq--f {
+  bottom: 1.5rem;
+  left: 0.6rem;
+  width: 0.7rem;
+  height: 0.7rem;
+}
+
+/* --- Responsive --------------------------------------------------------- */
+
+/* Below the hero's two-column breakpoint the portrait stacks under the copy,
+   centred, with the accents scaled down so they stay subtle. */
+@media (max-width: 1023px) {
+  .portrait {
+    width: clamp(13rem, 74vw, 20rem);
+    margin-top: 1.5rem;
+    padding: 1.75rem 1.5rem;
+  }
+
+  .portrait__sq--a {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .portrait__sq--e {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .portrait__sq--d {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .portrait {
+    width: min(17rem, 82vw);
+    padding: 1.25rem 1.1rem;
+  }
+
+  .portrait__sq--b,
+  .portrait__sq--f {
+    width: 0.4rem;
+    height: 0.4rem;
+  }
+
+  .portrait__sq--c {
+    width: 0.6rem;
+    height: 0.6rem;
   }
 }
