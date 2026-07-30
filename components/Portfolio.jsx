@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Shield,
   Terminal,
+  Cpu,
   Eye,
   Bug,
   Github,
@@ -177,13 +178,24 @@ export default function Portfolio() {
   const experiences = [
     {
       type: "Education",
-      title: "B.Tech in Computer Science and Engineering",
+      title:
+        "B.Tech in Computer Science and Engineering with Specialization in Information Security",
       organization: "Vellore Institute of Technology (VIT), Vellore",
       period: "Expected Graduation: 2027",
       description:
         "Currently pursuing Bachelor of Technology in Computer Science and Engineering with focus on cybersecurity, software development, and mobile application development.",
       icon: Database,
       color: "border-blue-500",
+    },
+    {
+      type: "Internship",
+      title: "Artificial Intelligence Intern",
+      organization: "Martvalley Online Pvt. Ltd",
+      period: "May 2025 – July 2025",
+      description:
+        "Contributed real-time AI modules across 5+ development projects, cutting end-to-end processing latency by 30% and improving system throughput by 25%. Optimised ML training workflows and integrated models into production environments. Collaborated with cross-functional teams on pipelines processing 5,000+ images per week, raising model accuracy by 5%.",
+      icon: Cpu,
+      color: "border-purple-500",
     },
     {
       type: "Internship",
@@ -206,6 +218,12 @@ export default function Portfolio() {
       color: "border-cyan-500",
     },
   ];
+
+  // Split by type rather than maintaining two parallel arrays, so the columns
+  // stay in sync with the source data. Array order is preserved, which keeps
+  // the newest qualification at the top of each timeline.
+  const education = experiences.filter((item) => item.type === "Education");
+  const work = experiences.filter((item) => item.type !== "Education");
 
   return (
     <div className="min-h-screen bg-black text-green-400 relative overflow-hidden">
@@ -519,35 +537,52 @@ export default function Portfolio() {
             </p>
           </div>
 
-          <Reveal stagger className="space-y-8">
-            {experiences.map((item, index) => (
-              <div
-                key={index}
-                className={`bg-gray-900/50 backdrop-blur-sm rounded-lg p-6 border-l-4 ${item.color} hover:bg-gray-800/50 hover:translate-x-2 transition-all duration-300`}
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <item.icon className="h-5 w-5 text-cyan-400" />
-                    <h3 className="text-lg sm:text-xl font-semibold text-white font-mono">
-                      {item.title}
-                    </h3>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="border-gray-600 text-gray-300 bg-gray-800/50 font-mono w-fit"
-                  >
-                    {item.period}
-                  </Badge>
-                </div>
-                <p className="text-cyan-400 font-medium mb-2 font-mono">
-                  {item.organization}
-                </p>
-                <p className="text-gray-400 font-mono text-sm leading-relaxed">
-                  {item.description}
-                </p>
+          {/* Two columns above 768px, Education stacked above Experience below */}
+          <div className="grid md:grid-cols-2 gap-10 md:gap-8 lg:gap-12">
+            {[
+              { emoji: "🎓", label: "Education", items: education },
+              { emoji: "💼", label: "Experience", items: work },
+            ].map((column) => (
+              <div key={column.label}>
+                <h3 className="text-lg sm:text-xl font-bold text-white font-mono mb-6">
+                  <span className="text-cyan-400">&gt;</span>{" "}
+                  <span aria-hidden="true">{column.emoji}</span> {column.label}
+                </h3>
+
+                <Reveal as="ol" stagger className="timeline">
+                  {column.items.map((item, index) => (
+                    <li key={index} className="timeline__item">
+                      <div
+                        className={`bg-gray-900/50 backdrop-blur-sm rounded-lg p-5 border-l-4 ${item.color} hover:bg-gray-800/50 transition-all duration-300`}
+                      >
+                        <div className="flex items-start space-x-3 mb-2">
+                          <item.icon className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
+                          <h4 className="text-base sm:text-lg font-semibold text-white font-mono leading-snug">
+                            {item.title}
+                          </h4>
+                        </div>
+
+                        <p className="text-cyan-400 font-medium mb-2 font-mono text-sm">
+                          {item.organization}
+                        </p>
+
+                        <Badge
+                          variant="outline"
+                          className="border-gray-600 text-gray-300 bg-gray-800/50 font-mono text-xs w-fit mb-3"
+                        >
+                          {item.period}
+                        </Badge>
+
+                        <p className="text-gray-400 font-mono text-xs sm:text-sm leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </Reveal>
               </div>
             ))}
-          </Reveal>
+          </div>
         </Reveal>
       </section>
 
