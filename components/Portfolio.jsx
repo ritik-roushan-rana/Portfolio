@@ -144,7 +144,7 @@ export default function Portfolio() {
       // Add preview: "/projects/vtour.png" once the screenshot exists.
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
-      github: "https://github.com/SHIELD78/VTOUR",
+      github: "https://github.com/ritik-roushan-rana/VTOUR",
       demo: "https://drive.google.com/file/d/1QyKJeWc1yVEDrFa4WhFBdcjEeyPYIWkX/view?usp=drivesdk",
     },
     {
@@ -154,7 +154,10 @@ export default function Portfolio() {
       tech: ["Cybersecurity", "Cowrie", "Ubuntu", "ELK", "Virtual Machines"],
       icon: Bug,
       color: "from-red-500 to-pink-500",
-      github: "https://github.com/SHIELD78/SSH-Honeypot-ELK",
+      // No public repo exists for this one on either account, so the VIEW CODE
+      // button is omitted rather than linking to a 404. Add the URL back here
+      // once the repository is published.
+      github: null,
       demo: "https://youtu.be/6NElUW4gqSc",
     },
     {
@@ -164,7 +167,7 @@ export default function Portfolio() {
       tech: ["React", "Express.js", "MongoDB", "Clerk Auth"],
       icon: Terminal,
       color: "from-purple-500 to-violet-500",
-      github: "https://github.com/SHIELD78/web-project",
+      github: "https://github.com/ritik-roushan-rana/web-project",
       demo: "https://organizo-task-manager.netlify.app",
     },
   ];
@@ -237,10 +240,12 @@ export default function Portfolio() {
       >
         <div
           className={`site-nav__shell bg-gray-900/80 backdrop-blur-md border border-cyan-500/30 rounded-full ${
-            isScrolled ? "px-6 py-2" : "px-8 py-3"
+            isScrolled ? "px-4 py-2 sm:px-6" : "px-4 py-2 sm:px-8 sm:py-3"
           }`}
         >
-          <div className="flex space-x-8">
+          {/* Labels are hidden below sm: five labelled items measure roughly
+              590px, which does not fit a 375px viewport. Icons only there. */}
+          <div className="flex space-x-5 sm:space-x-8">
             {[
               { icon: Shield, label: "Home", target: "home" },
               { icon: Zap, label: "Skills", target: "skills" },
@@ -251,10 +256,11 @@ export default function Portfolio() {
               <button
                 key={item.label}
                 onClick={() => handleNavClick(item.target)}
-                className="flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 hover:scale-110 transition-all duration-200 font-mono text-sm cursor-pointer"
+                aria-label={item.label}
+                className="flex items-center sm:space-x-2 text-cyan-400 hover:text-cyan-300 hover:scale-110 transition-all duration-200 font-mono text-sm cursor-pointer"
               >
                 <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </button>
             ))}
           </div>
@@ -277,16 +283,16 @@ export default function Portfolio() {
               }`}
             >
               <div className="space-y-2">
-                <p className="text-cyan-400 font-mono text-lg flex items-center animate-fade-in">
+                <p className="text-cyan-400 font-mono text-base sm:text-lg flex items-center animate-fade-in">
                   <Terminal className="mr-2 h-5 w-5" />
                   Welcome to my digital portfolio
                 </p>
 
-                <h1 className="text-6xl lg:text-8xl font-bold text-white mb-4 hover:animate-pulse">
+                <h1 className="text-5xl sm:text-6xl lg:text-8xl font-bold text-white mb-4 hover:animate-pulse">
                   Hello
                 </h1>
 
-                <h2 className="text-4xl lg:text-6xl font-bold">
+                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-bold">
                   I&apos;m{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-green-400 animate-gradient font-black uppercase tracking-wider">
                     RITIK ROUSHAN RANA
@@ -295,7 +301,9 @@ export default function Portfolio() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center space-x-4 text-lg">
+                {/* Wraps rather than overflowing: the two pills exceed a
+                    narrow viewport side by side. */}
+                <div className="flex flex-wrap items-center gap-3 text-base sm:text-lg">
                   <Badge
                     variant="outline"
                     className="border-green-500 text-green-400 bg-green-500/10 hover:bg-green-500/20 transition-colors"
@@ -310,7 +318,7 @@ export default function Portfolio() {
                   </Badge>
                 </div>
 
-                <p className="text-xl text-gray-300 leading-relaxed font-mono">
+                <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed font-mono">
                   <TypingEffect
                     text="I’m a Computer Science student at VIT Vellore specializing in mobile and frontend development, creating responsive, user-focused apps with Flutter and modern frameworks, driven by a passion for cybersecurity and AI to build secure and innovative digital experiences."
                     speed={30}
@@ -352,7 +360,7 @@ export default function Portfolio() {
                 {[
                   {
                     icon: Github,
-                    href: "https://github.com/SHIELD78",
+                    href: "https://github.com/ritik-roushan-rana?tab=repositories",
                     label: "GitHub",
                     glow: "social-link--github",
                   },
@@ -423,13 +431,13 @@ export default function Portfolio() {
       </div>
 
       {/* Skills Section */}
-      <section id="skills" className="py-20 relative">
+      <section id="skills" className="py-14 sm:py-20 relative">
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4 font-mono">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-cyan-400">&gt;</span> Skills
             </h2>
-            <p className="text-xl text-gray-400 font-mono">
+            <p className="text-base sm:text-xl text-gray-400 font-mono">
               Technologies and tools I work with
             </p>
           </div>
@@ -440,12 +448,12 @@ export default function Portfolio() {
                 key={index}
                 className="relative group hover:-translate-y-2 hover:scale-105 transition-all duration-300"
               >
-                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-lg p-8 h-full hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row md:space-x-8">
+                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-lg p-6 sm:p-8 h-full hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row md:space-x-8">
                   <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${skillGroup.color} rounded-lg mb-4 group-hover:scale-110 transition-transform`}>
                     <skillGroup.icon className="h-8 w-20 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-4 font-mono">
+                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 font-mono">
                       {skillGroup.category}
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -468,13 +476,13 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-20 relative">
+      <section id="projects" className="py-14 sm:py-20 relative">
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4 font-mono">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-green-400">&gt;</span> Projects
             </h2>
-            <p className="text-xl text-gray-400 font-mono">
+            <p className="text-base sm:text-xl text-gray-400 font-mono">
               Featured development and technical projects
             </p>
           </div>
@@ -498,13 +506,13 @@ export default function Portfolio() {
         </Reveal>
       </section>
       {/* Experience Section */}
-      <section id="experience" className="py-20 relative">
+      <section id="experience" className="py-14 sm:py-20 relative">
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4 font-mono">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-red-400">&gt;</span> Experience & Education
             </h2>
-            <p className="text-xl text-gray-400 font-mono">
+            <p className="text-base sm:text-xl text-gray-400 font-mono">
               My professional and academic background
             </p>
           </div>
@@ -518,7 +526,7 @@ export default function Portfolio() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <item.icon className="h-5 w-5 text-cyan-400" />
-                    <h3 className="text-xl font-semibold text-white font-mono">
+                    <h3 className="text-lg sm:text-xl font-semibold text-white font-mono">
                       {item.title}
                     </h3>
                   </div>
@@ -542,14 +550,14 @@ export default function Portfolio() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 relative">
+      <section id="contact" className="py-14 sm:py-20 relative">
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-12 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300">
-            <h2 className="text-4xl font-bold text-white mb-4 font-mono">
+          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 sm:p-8 lg:p-12 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
               <span className="text-cyan-400">&gt;</span> Let&apos;s Connect &amp;
               Collaborate
             </h2>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto font-mono">
+            <p className="text-base sm:text-xl text-gray-400 mb-8 max-w-2xl mx-auto font-mono">
               Ready to discuss projects, opportunities, or just connect?
               Let&apos;s build something amazing together.
             </p>

@@ -49,7 +49,7 @@ Requires Node.js 18.18 or newer.
 
 ```bash
 # Clone the repository
-git clone https://github.com/SHIELD78/Portfolio.git
+git clone https://github.com/ritik-roushan-rana/Portfolio.git
 cd Portfolio
 
 # Install dependencies
@@ -73,5 +73,5 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 ## Contact
 
 - Email: ritikrana8596@gmail.com
-- GitHub: [@SHIELD78](https://github.com/SHIELD78)
+- GitHub: [@ritik-roushan-rana](https://github.com/ritik-roushan-rana?tab=repositories)
 - LinkedIn: [Ritik Roushan Rana](https://www.linkedin.com/in/ritik-roushan-rana-b6a89528a/)

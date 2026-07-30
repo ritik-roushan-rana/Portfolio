@@ -541,22 +541,30 @@
   transform: translate3d(0, -50%, 0);
 }
 
-/* Tighter on small screens rather than removed, so the affordance survives. */
-@media (max-width: 640px) {
+/* Tightened on tablets; the labels have no hover to reveal them on touch. */
+@media (max-width: 1023px) {
   .section-dots {
-    right: 0.6rem;
+    right: 0.75rem;
   }
 
   .section-dots__list {
-    gap: 0.7rem;
+    gap: 0.8rem;
   }
 
   .section-dots__dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
   }
 
   .section-dots__label {
+    display: none;
+  }
+}
+
+/* Dropped on phones: at 375px the dots land within a few pixels of the text
+   edge, and the top nav already provides section navigation. */
+@media (max-width: 640px) {
+  .section-dots {
     display: none;
   }
 }
