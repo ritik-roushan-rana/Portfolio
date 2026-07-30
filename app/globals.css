@@ -379,88 +379,15 @@
 /* ===========================================================================
    Cinematic scroll layer
    ---------------------------------------------------------------------------
-   Preloader, section dots, staggered reveals, project preview reveal, marquee.
+   Section dots, staggered reveals, project banner reveal, marquee.
    Transform/opacity only. Palette unchanged: #00ff41, #22d3ee, black ground.
    =========================================================================== */
 
-/* --- 1. Preloader -------------------------------------------------------- */
-
-.preloader {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #000000;
-  opacity: 1;
-  transition:
-    opacity 520ms ease,
-    visibility 520ms ease;
-  /* Failsafe: clears itself even if the component never runs, so a script
-     error cannot leave the page covered. Far longer than the JS path needs. */
-  animation: preloader-failsafe 1ms linear 8s forwards;
-}
-
-.preloader--hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-@keyframes preloader-failsafe {
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-.preloader__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.preloader__count {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: clamp(3.5rem, 12vw, 7rem);
-  font-weight: 700;
-  line-height: 1;
-  color: #ffffff;
-  /* Tabular figures stop the counter jittering as digits change width. */
-  font-variant-numeric: tabular-nums;
-}
-
-.preloader__pct {
-  margin-left: 0.15em;
-  font-size: 0.32em;
-  color: #00ff41;
-  vertical-align: super;
-}
-
-.preloader__track {
-  position: relative;
-  display: block;
-  width: min(16rem, 60vw);
-  height: 1px;
-  overflow: hidden;
-  background-color: rgba(34, 211, 238, 0.2);
-}
-
-.preloader__bar {
-  display: block;
-  height: 100%;
-  transform-origin: 0 50%;
-  background: linear-gradient(90deg, #00ff41, #22d3ee);
-}
 
 /* The hero's own entrance is driven by its existing Tailwind transition
-   classes, gated on useAppReady() so it plays as the overlay clears. */
-
+   classes, released on mount. */
 /* --- 2. Section dot navigation ------------------------------------------ */
-
+/* --- Section dot navigation ---------------------------------------------- */
 .section-dots {
   position: fixed;
   top: 50%;
@@ -804,10 +731,6 @@
 /* --- Reduced motion ----------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .preloader {
-    display: none;
-  }
-
   .reveal-stagger > * {
     opacity: 1;
     transform: none;

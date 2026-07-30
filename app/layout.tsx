@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import PointerTracker from '@/components/interactive/PointerTracker'
-import Preloader from '@/components/interactive/Preloader'
 import ScrollProgress from '@/components/interactive/ScrollProgress'
 import './globals.css'
 
@@ -42,7 +41,6 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body>
-        <Preloader />
         <ScrollProgress />
         <PointerTracker />
         {children}

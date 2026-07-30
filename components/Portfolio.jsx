@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Shield,
   Terminal,
@@ -26,15 +26,17 @@ import HeroPortrait from "./HeroPortrait";
 import Marquee from "./interactive/Marquee";
 import ProjectCard from "./interactive/ProjectCard";
 import SectionDots from "./interactive/SectionDots";
-import { useAppReady } from "./interactive/Preloader";
+
 
 export default function Portfolio() {
   const [expandedTech, setExpandedTech] = useState({});
   const [expandedDesc, setExpandedDesc] = useState({});
   const isScrolled = useScrolled(40);
-  // Held back until the preloader reaches 100%, so the hero animates in as the
-  // overlay clears rather than behind it.
-  const isVisible = useAppReady();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const toggleTechExpansion = (projectIndex) => {
     setExpandedTech(prev => ({
