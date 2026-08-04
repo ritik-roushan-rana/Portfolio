@@ -610,7 +610,7 @@ export default function Portfolio() {
                 ritikrana8596@gmail.com
               </Button>
               <a
-                href="https://drive.google.com/file/d/1xvyeKg_B4nbMg7nfAKa4onIiVJSoMK6a/view?usp=drive_link"
+                href="https://drive.google.com/file/d/1vhBi2CfbaQDo-NzdqEiLRe8hky1TdnFA/view?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-4 py-2 border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono bg-transparent hover:scale-105 transition-transform text-sm rounded-lg"
