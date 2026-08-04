@@ -226,8 +226,11 @@ export default function Portfolio() {
   const work = experiences.filter((item) => item.type !== "Education");
 
   return (
-    <div className="min-h-screen bg-black text-green-400 relative overflow-hidden">
-      {/* Matrix Background Effect */}
+    // Transparent ground: the page now sits on the KineticGrid canvas mounted
+    // in app/page.tsx. An opaque bg here would paint straight over it.
+    <div className="min-h-screen bg-transparent text-green-400 relative overflow-hidden">
+      {/* Matrix Background Effect — kept at opacity-10 so the binary texture
+          still reads as brand identity without hiding the grid underneath */}
       <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-black to-cyan-900/20" />
