@@ -37,99 +37,12 @@
    utilities are purged unless the exact class name appears in scanned markup,
    and these rules are keyed off data attributes and parent state.
 
-   components/interactive/PointerTracker.jsx publishes the eased pointer
-   position once per frame, in two forms:
-     --px / --py    viewport pixels, for the spotlight
-     --pnx / --pny  normalised -1..1 from viewport centre, for the parallax
-   One rAF loop feeds every cursor-reactive effect below.
+   The binary 0/1 tiles and the cursor-following spotlight that used to live
+   here were removed, along with the PointerTracker that fed them. Cursor
+   reaction now comes from the canvas backgrounds in components/ui.
 
    Accent palette: #00ff41 (green) and #22d3ee (teal), matching tailwind.config.
    =========================================================================== */
-
-:root {
-  /* Binary tile shared by the background and its cursor spotlight.
-     Note the kebab-case SVG attributes - the previous inline version used
-     camelCase (fillOpacity, fontFamily), which SVG ignores. */
-  --matrix-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='%2300ff41' fill-opacity='0.55' font-family='monospace' font-size='12'%3E%3Ctext x='10' y='20'%3E1%3C/text%3E%3Ctext x='30' y='40'%3E0%3C/text%3E%3Ctext x='50' y='15'%3E1%3C/text%3E%3C/g%3E%3C/svg%3E");
-  --matrix-tile-hot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='%2367e8f9' font-family='monospace' font-size='12'%3E%3Ctext x='10' y='20'%3E1%3C/text%3E%3Ctext x='30' y='40'%3E0%3C/text%3E%3Ctext x='50' y='15'%3E1%3C/text%3E%3C/g%3E%3C/svg%3E");
-}
-
-/* --- 1. Pointer-follow spotlight + parallax ----------------------------- */
-
-/* The native cursor is deliberately left alone. --px/--py (pixels) and
-   components/interactive/PointerTracker.jsx, already eased, so every consumer
-   below inherits the same smooth motion from a single rAF loop. */
-
-/* --- 5. Binary background reacting to the cursor ------------------------- */
-
-.matrix-field {
-  position: absolute;
-  inset: 0;
-  background-image: var(--matrix-tile);
-}
-
-/* A small element that rides the cursor, showing brighter cyan digits.
-   background-attachment: fixed keeps the tile locked to the viewport so the
-   digits line up with the dim layer underneath instead of sliding along. */
-.matrix-spotlight {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 22.5rem; /* 360px */
-  height: 22.5rem;
-  margin: -11.25rem 0 0 -11.25rem;
-  pointer-events: none;
-  background-image: var(--matrix-tile-hot);
-  background-attachment: fixed;
-  opacity: 0;
-  transform: translate3d(var(--px, -100vw), var(--py, -100vw), 0);
-  transition: opacity 300ms ease;
-  will-change: transform;
-  -webkit-mask-image: radial-gradient(
-    closest-side,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.5) 45%,
-    transparent 72%
-  );
-  mask-image: radial-gradient(
-    closest-side,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.5) 45%,
-    transparent 72%
-  );
-}
-
-/* Faded in only once the pointer has actually moved, so the spotlight does not
-   sit parked in the middle of the viewport on load. */
-.pointer-active .matrix-spotlight {
-  opacity: 0.5;
-}
-
-/* A soft ambient wash under the same spotlight, lifting the whole area very
-   slightly rather than only the digits. */
-.pointer-spotlight {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 25rem;
-  height: 25rem;
-  margin: -12.5rem 0 0 -12.5rem;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    closest-side,
-    rgba(34, 211, 238, 0.09),
-    rgba(0, 255, 65, 0.05) 45%,
-    transparent 72%
-  );
-  transform: translate3d(var(--px, -100vw), var(--py, -100vw), 0);
-  transition: opacity 300ms ease;
-  will-change: transform;
-}
-
-.pointer-active .pointer-spotlight {
-  opacity: 1;
-}
 
 /* --- 2. Typewriter caret ------------------------------------------------- */
 
@@ -284,11 +197,22 @@
 }
 
 .site-nav--condensed .site-nav__shell {
-  background-color: rgba(3, 7, 18, 0.92);
-  border-color: rgba(34, 211, 238, 0.55);
-  box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.9);
+  background-color: rgba(18, 8, 31, 0.92);
+  border-color: rgba(192, 132, 252, 0.55);
+  box-shadow:
+    0 8px 30px -12px rgba(0, 0, 0, 0.9),
+    0 0 18px -6px rgba(192, 132, 252, 0.35);
   -webkit-backdrop-filter: blur(20px) saturate(140%);
   backdrop-filter: blur(20px) saturate(140%);
+}
+
+/* The crystal glow on the active/hovered item, matching the shard colour that
+   the canvas behind these links paints. */
+.site-nav__link:hover,
+.site-nav__link:focus-visible {
+  text-shadow:
+    0 0 5px #c084fc,
+    0 0 10px #c084fc;
 }
 
 /* --- 8. Per-platform social glows --------------------------------------- */
@@ -360,26 +284,12 @@
   }
 
 
-  .pointer-spotlight,
-  .matrix-spotlight {
-    display: none;
-  }
-}
-
-/* Cursor-driven effects have nothing to follow without a hovering pointer.
-   PointerTracker also bails out in JS; this is the CSS belt to that braces. */
-@media (hover: none), (pointer: coarse) {
-  .pointer-spotlight,
-  .matrix-spotlight {
-    display: none;
-  }
-
 }
 
 /* ===========================================================================
    Cinematic scroll layer
    ---------------------------------------------------------------------------
-   Section dots, staggered reveals, project banner reveal, marquee.
+   Section dots, staggered reveals, project banner reveal.
    Transform/opacity only. Palette unchanged: #00ff41, #22d3ee, black ground.
    =========================================================================== */
 
@@ -671,63 +581,6 @@
   }
 }
 
-/* --- 5. Tools marquee --------------------------------------------------- */
-
-.marquee {
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
-}
-
-.marquee__track {
-  display: flex;
-  width: max-content;
-  animation-name: marquee-scroll;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform;
-}
-
-.marquee__item {
-  display: inline-flex;
-  align-items: center;
-  flex: none;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.85);
-}
-
-.marquee__sep {
-  margin: 0 1.6rem;
-  color: #00ff41;
-}
-
-/* List is rendered twice, so -50% lands copy two exactly where copy one
-   began - no seam. */
-@keyframes marquee-scroll {
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-.marquee:hover .marquee__track {
-  animation-play-state: paused;
-}
-
 /* --- Reduced motion ----------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -737,9 +590,6 @@
     transition: none;
   }
 
-  .marquee__track {
-    animation: none;
-  }
 
   .project-card__overlay,
   .project-card__banner-media {

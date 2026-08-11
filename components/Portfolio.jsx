@@ -24,9 +24,9 @@ import MagneticButton from "./interactive/MagneticButton";
 import Reveal from "./interactive/Reveal";
 import useScrolled from "./interactive/useScrolled";
 import HeroPortrait from "./HeroPortrait";
-import Marquee from "./interactive/Marquee";
 import ProjectCard from "./interactive/ProjectCard";
 import SectionDots from "./interactive/SectionDots";
+import CrystalTrailSurface from "./ui/crystal-trail-surface";
 
 
 export default function Portfolio() {
@@ -226,20 +226,15 @@ export default function Portfolio() {
   const work = experiences.filter((item) => item.type !== "Education");
 
   return (
-    // Transparent ground: the page now sits on the KineticGrid canvas mounted
-    // in app/page.tsx. An opaque bg here would paint straight over it.
+    // Transparent ground: the page sits on the wave canvas mounted in
+    // app/page.tsx. An opaque bg here would paint straight over it.
     <div className="min-h-screen bg-transparent text-green-400 relative overflow-hidden">
-      {/* Matrix Background Effect — kept at opacity-10 so the binary texture
-          still reads as brand identity without hiding the grid underneath */}
+      {/* Ambient tint only. The binary 0/1 texture and the cursor spotlight
+          that used to sit here are both gone. */}
       <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-black to-cyan-900/20" />
-          <div className="matrix-field" />
         </div>
-        {/* Pointer-following spotlight: a soft ambient wash plus brighter
-            binary digits within its radius (see globals.css) */}
-        <div className="pointer-spotlight" />
-        <div className="matrix-spotlight" />
       </div>
 
       {/* Section dot navigation */}
@@ -261,14 +256,18 @@ export default function Portfolio() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
         }`}
       >
+        {/* relative + overflow-hidden so the shard canvas is clipped to the
+            pill's rounded edge instead of spilling past it. */}
         <div
-          className={`site-nav__shell bg-gray-900/80 backdrop-blur-md border border-cyan-500/30 rounded-full ${
+          className={`site-nav__shell relative overflow-hidden bg-[#12081f]/80 backdrop-blur-md border border-purple-400/30 rounded-full ${
             isScrolled ? "px-4 py-2 sm:px-6" : "px-4 py-2 sm:px-8 sm:py-3"
           }`}
         >
+          <CrystalTrailSurface />
+
           {/* Labels are hidden below sm: five labelled items measure roughly
               590px, which does not fit a 375px viewport. Icons only there. */}
-          <div className="flex space-x-5 sm:space-x-8">
+          <div className="relative z-10 flex space-x-5 sm:space-x-8">
             {[
               { icon: Shield, label: "Home", target: "home" },
               { icon: Zap, label: "Skills", target: "skills" },
@@ -280,7 +279,7 @@ export default function Portfolio() {
                 key={item.label}
                 onClick={() => handleNavClick(item.target)}
                 aria-label={item.label}
-                className="flex items-center sm:space-x-2 text-cyan-400 hover:text-cyan-300 hover:scale-110 transition-all duration-200 font-mono text-sm cursor-pointer"
+                className="site-nav__link flex items-center sm:space-x-2 text-purple-200 hover:text-white hover:scale-110 transition-all duration-200 font-mono text-sm cursor-pointer"
               >
                 <item.icon className="h-4 w-4" />
                 <span className="hidden sm:inline">{item.label}</span>
@@ -433,25 +432,6 @@ export default function Portfolio() {
           </div>
         </div>
       </section>
-
-      {/* Tools marquee */}
-      <div className="relative border-y border-gray-800/70 bg-black/40 py-4">
-        <Marquee
-          items={[
-            "Python",
-            "Flutter",
-            "Next.js",
-            "React",
-            "PyTorch",
-            "Wireshark",
-            "ELK Stack",
-            "MongoDB",
-            "Kali Linux",
-            "Git",
-          ]}
-          speed={40}
-        />
-      </div>
 
       {/* Skills Section */}
       <section id="skills" className="py-14 sm:py-20 relative">
