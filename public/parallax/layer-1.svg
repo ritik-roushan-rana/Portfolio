@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" fill="none" preserveAspectRatio="xMidYMax slice">
+  <title>Foreground crystal ridge</title>
+  <defs>
+    <linearGradient id="shardFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0f2e" stop-opacity="0.92" />
+      <stop offset="100%" stop-color="#0a0514" stop-opacity="1" />
+    </linearGradient>
+    <linearGradient id="ridgeEdge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#00ff41" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Back ridge: lower, dimmer, reads as depth behind the main ridge -->
+  <path
+    d="M-40 900V690l180-70 150 60 190-110 170 80 200-120 210 90 180-70 200 80 200-40v310z"
+    fill="#140a24"
+    fill-opacity="0.75"
+  />
+
+  <!-- Main crystal ridge -->
+  <path
+    d="M-40 900V760l150-90 130 70 160-120 140 90 180-140 170 110 150-80 160 100 140-60 180 70v200z"
+    fill="url(#shardFill)"
+  />
+  <path
+    d="M-40 760l150-90 130 70 160-120 140 90 180-140 170 110 150-80 160 100 140-60 180 70"
+    stroke="url(#ridgeEdge)"
+    stroke-width="2"
+  />
+
+  <!-- Facet lines catching light on the ridge peaks -->
+  <g stroke="#c084fc" stroke-opacity="0.22" stroke-width="1.2">
+    <path d="M110 670l70 230M240 740l-40 160M400 620l60 280M540 710l-30 190M720 570l80 330M890 680l-40 220M1040 600l50 300M1200 700l-30 200M1340 640l60 260" />
+  </g>
+
+  <!-- Standing shards along the ridge line -->
+  <g>
+    <path d="M300 690l22 14v46l-22 14-22-14v-46z" fill="#0a0514" stroke="#00ff41" stroke-opacity="0.5" stroke-width="1.5" />
+    <path d="M760 560l26 16v52l-26 16-26-16v-52z" fill="#0a0514" stroke="#c084fc" stroke-opacity="0.55" stroke-width="1.5" />
+    <path d="M1230 660l20 12v40l-20 12-20-12v-40z" fill="#0a0514" stroke="#22d3ee" stroke-opacity="0.5" stroke-width="1.5" />
+  </g>
+</svg>

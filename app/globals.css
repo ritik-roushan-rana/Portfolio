@@ -7,9 +7,11 @@
     @apply border-border;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  /* No `scroll-behavior: smooth` here on purpose. Lenis (mounted by
+     components/ui/parallax-scrolling.tsx) drives scrolling itself, and CSS
+     smooth scrolling on the root element fights it. In-page jumps go through
+     lib/smooth-scroll.ts, which uses Lenis when active and falls back to
+     native smooth scrolling for reduced-motion visitors. */
 
   body {
     @apply bg-background text-foreground;

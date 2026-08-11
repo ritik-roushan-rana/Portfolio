@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" fill="none">
+  <title>Mid-ground circuit traces and hex nodes</title>
+  <defs>
+    <linearGradient id="traceGreen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00ff41" stop-opacity="0" />
+      <stop offset="35%" stop-color="#00ff41" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.15" />
+    </linearGradient>
+    <linearGradient id="traceCyan" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0" />
+      <stop offset="40%" stop-color="#22d3ee" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.18" />
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Soft diagonal light shafts -->
+  <g>
+    <path d="M240 0l120 0-260 620-120 0z" fill="url(#beam)" />
+    <path d="M1180 0l150 0-210 560-150 0z" fill="url(#beam)" />
+  </g>
+
+  <!-- Right-angled circuit traces, left cluster -->
+  <g stroke="url(#traceGreen)" stroke-width="2" stroke-linecap="square">
+    <path d="M-20 470h250v-120h180v-90h210" />
+    <path d="M-20 560h330v-70h150" />
+    <path d="M120 900v-160h190v-80h140" />
+  </g>
+
+  <!-- Right cluster -->
+  <g stroke="url(#traceCyan)" stroke-width="2" stroke-linecap="square">
+    <path d="M1620 430h-260v-110h-200v-80h-160" />
+    <path d="M1620 610h-300v-90h-170" />
+    <path d="M1480 900v-200h-180v-70h-130" />
+  </g>
+
+  <!-- Trace junction nodes -->
+  <g fill="#0a0514" stroke="#00ff41" stroke-opacity="0.7" stroke-width="2">
+    <circle cx="231" cy="470" r="5" />
+    <circle cx="411" cy="350" r="5" />
+    <circle cx="330" cy="560" r="5" />
+    <circle cx="310" cy="740" r="5" />
+  </g>
+  <g fill="#0a0514" stroke="#22d3ee" stroke-opacity="0.7" stroke-width="2">
+    <circle cx="1360" cy="430" r="5" />
+    <circle cx="1160" cy="320" r="5" />
+    <circle cx="1320" cy="610" r="5" />
+    <circle cx="1300" cy="700" r="5" />
+  </g>
+
+  <!-- Hex outlines echoing the crystal shards in the page background -->
+  <g stroke="#c084fc" fill="none">
+    <path d="M690 120l52 30v60l-52 30-52-30v-60z" stroke-opacity="0.30" />
+    <path d="M980 700l38 22v44l-38 22-38-22v-44z" stroke-opacity="0.22" />
+    <path d="M180 200l30 17v35l-30 17-30-17v-35z" stroke-opacity="0.18" />
+    <path d="M1420 180l44 25v51l-44 25-44-25v-51z" stroke-opacity="0.24" />
+  </g>
+</svg>

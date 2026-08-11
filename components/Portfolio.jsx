@@ -27,6 +27,8 @@ import HeroPortrait from "./HeroPortrait";
 import ProjectCard from "./interactive/ProjectCard";
 import SectionDots from "./interactive/SectionDots";
 import CrystalTrailSurface from "./ui/crystal-trail-surface";
+import { ParallaxComponent } from "./ui/parallax-scrolling";
+import { scrollToSection } from "@/lib/smooth-scroll";
 
 
 export default function Portfolio() {
@@ -53,14 +55,10 @@ export default function Portfolio() {
     }));
   };
 
+  // Routed through the shared helper so the jump is handed to Lenis while it is
+  // driving the scroll. A native smooth scrollIntoView would fight it.
   const handleNavClick = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+    scrollToSection(sectionId);
   };
 
   const skillGroups = [
@@ -323,23 +321,6 @@ export default function Portfolio() {
               </div>
 
               <div className="space-y-4">
-                {/* Wraps rather than overflowing: the two pills exceed a
-                    narrow viewport side by side. */}
-                <div className="flex flex-wrap items-center gap-3 text-base sm:text-lg">
-                  <Badge
-                    variant="outline"
-                    className="border-green-500 text-green-400 bg-green-500/10 hover:bg-green-500/20 transition-colors"
-                  >
-                    IBM Cyber Security Analyst
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="border-cyan-500 text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 transition-colors"
-                  >
-                    VIT CSE Student
-                  </Badge>
-                </div>
-
                 <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed font-mono">
                   <TypingEffect
                     text="I’m a Computer Science student at VIT Vellore specializing in mobile and frontend development, creating responsive, user-focused apps with Flutter and modern frameworks, driven by a passion for cybersecurity and AI to build secure and innovative digital experiences."
@@ -433,8 +414,10 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* Skills Section */}
-      <section id="skills" className="py-14 sm:py-20 relative">
+      {/* Skills Section, rendered on the parallax layers. ParallaxComponent
+          owns the <section id="skills"> element so nav anchors and the section
+          dots still resolve to it. */}
+      <ParallaxComponent id="skills">
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
@@ -476,7 +459,7 @@ export default function Portfolio() {
             ))}
           </Reveal>
         </Reveal>
-      </section>
+      </ParallaxComponent>
 
       {/* Projects Section */}
       <section id="projects" className="py-14 sm:py-20 relative">

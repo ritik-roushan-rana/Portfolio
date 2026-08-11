@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { scrollToSection } from "@/lib/smooth-scroll";
 
 /**
  * Fixed vertical section indicator on the right edge.
@@ -33,9 +34,10 @@ export default function SectionDots({ sections }) {
     return () => observer.disconnect();
   }, [sections]);
 
+  // Shared helper rather than scrollIntoView: Lenis owns the scroll position
+  // while it is active, and two animators fighting over it stalls the jump.
   const goTo = (id) => {
-    const element = document.getElementById(id);
-    if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToSection(id);
   };
 
   return (
