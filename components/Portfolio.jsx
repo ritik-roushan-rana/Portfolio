@@ -28,6 +28,7 @@ import ProjectCard from "./interactive/ProjectCard";
 import SectionDots from "./interactive/SectionDots";
 import CrystalTrailSurface from "./ui/crystal-trail-surface";
 import { ParallaxComponent } from "./ui/parallax-scrolling";
+import { AnimatedGradient } from "./ui/animated-gradient";
 import { scrollToSection } from "@/lib/smooth-scroll";
 
 
@@ -127,7 +128,7 @@ export default function Portfolio() {
         "Reinforcement Learning-driven portfolio rebalancer using Deep Q-Learning to optimize rebalancing policies from historical market data. Maximizes risk-adjusted returns while respecting user risk profiles and transaction costs. Features Flutter iOS app for goal setting, backtesting on ETFs/stocks, and actionable rebalancing suggestions with performance visualization.",
       tech: ["Python", "PyTorch", "Stable-Baselines3", "Flutter", "Express.js", "MongoDB", "Yahoo Finance API", "Quandl", "Matplotlib", "Plotly"],
       // Falls back to the placeholder artwork if the file is missing.
-      preview: "/projects/optifolio.png",
+      preview: "/projects/optifolio.webp",
       // 418x878 phone capture. At the standard 9/4 banner this centres the
       // "$1,187,543 / +1.4% this year" block at 28%-72% of the banner height,
       // clear of both the top edge and the bottom fade.
@@ -142,7 +143,10 @@ export default function Portfolio() {
       description:
         "Built a mobile app to guide students through virtual campus tours using Flutter. Designed intuitive UI/UX for a smooth and interactive navigation experience. Provided students with easy access to campus maps, departments, and facility information.",
       tech: ["Flutter", "Supabase", "UI/UX", "IOS Development"],
-      // Add preview: "/projects/vtour.png" once the screenshot exists.
+      preview: "/projects/vtour.webp",
+      // Skips the phone status bar at the very top of the capture and lands on
+      // the "Welcome to VTour" header, which is what identifies the app.
+      previewPosition: "center 10%",
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
       github: "https://github.com/ritik-roushan-rana/VTOUR",
@@ -417,7 +421,14 @@ export default function Portfolio() {
       {/* Skills Section, rendered on the parallax layers. ParallaxComponent
           owns the <section id="skills"> element so nav anchors and the section
           dots still resolve to it. */}
-      <ParallaxComponent id="skills">
+      <ParallaxComponent
+        id="skills"
+        background={
+          // The component's own Aurora preset, unmodified: #0a001a / #1a0b2e /
+          // #f20089 at its shipped rotation, scale, speed and Edge shape.
+          <AnimatedGradient config={{ preset: "Aurora" }} />
+        }
+      >
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
