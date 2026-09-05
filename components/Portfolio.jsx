@@ -26,9 +26,7 @@ import useScrolled from "./interactive/useScrolled";
 import HeroPortrait from "./HeroPortrait";
 import ProjectCard from "./interactive/ProjectCard";
 import SectionDots from "./interactive/SectionDots";
-import CrystalTrailSurface from "./ui/crystal-trail-surface";
 import { ParallaxComponent } from "./ui/parallax-scrolling";
-import { AnimatedGradient } from "./ui/animated-gradient";
 import { scrollToSection } from "@/lib/smooth-scroll";
 
 
@@ -127,12 +125,6 @@ export default function Portfolio() {
       description:
         "Reinforcement Learning-driven portfolio rebalancer using Deep Q-Learning to optimize rebalancing policies from historical market data. Maximizes risk-adjusted returns while respecting user risk profiles and transaction costs. Features Flutter iOS app for goal setting, backtesting on ETFs/stocks, and actionable rebalancing suggestions with performance visualization.",
       tech: ["Python", "PyTorch", "Stable-Baselines3", "Flutter", "Express.js", "MongoDB", "Yahoo Finance API", "Quandl", "Matplotlib", "Plotly"],
-      // Falls back to the placeholder artwork if the file is missing.
-      preview: "/projects/optifolio.webp",
-      // 418x878 phone capture. At the standard 9/4 banner this centres the
-      // "$1,187,543 / +1.4% this year" block at 28%-72% of the banner height,
-      // clear of both the top edge and the bottom fade.
-      previewPosition: "center 19%",
       icon: Zap,
       color: "from-yellow-500 to-orange-500",
       github: "https://github.com/ritik-roushan-rana/OptiFolio",
@@ -143,10 +135,6 @@ export default function Portfolio() {
       description:
         "Built a mobile app to guide students through virtual campus tours using Flutter. Designed intuitive UI/UX for a smooth and interactive navigation experience. Provided students with easy access to campus maps, departments, and facility information.",
       tech: ["Flutter", "Supabase", "UI/UX", "IOS Development"],
-      preview: "/projects/vtour.webp",
-      // Skips the phone status bar at the very top of the capture and lands on
-      // the "Welcome to VTour" header, which is what identifies the app.
-      previewPosition: "center 10%",
       icon: Eye,
       color: "from-blue-500 to-cyan-500",
       github: "https://github.com/ritik-roushan-rana/VTOUR",
@@ -177,55 +165,45 @@ export default function Portfolio() {
     },
   ];
 
+  // A single chronological log (newest first), rendered as a git-style commit
+  // history. `tag` drives the chip colour; `hash` is decorative, mimicking a
+  // short commit SHA to sell the terminal metaphor.
   const experiences = [
     {
-      type: "Education",
+      tag: "edu",
+      label: "education",
+      hash: "7f3a9c2",
       title:
-        "B.Tech in Computer Science and Engineering with Specialization in Information Security",
+        "B.Tech CSE — Specialization in Information Security",
       organization: "Vellore Institute of Technology (VIT), Vellore",
-      period: "Expected Graduation: 2027",
+      period: "2023 — 2027 (expected)",
       description:
-        "Currently pursuing Bachelor of Technology in Computer Science and Engineering with focus on cybersecurity, software development, and mobile application development.",
+        "Pursuing Computer Science and Engineering with a focus on cybersecurity, software development, and mobile application development.",
       icon: Database,
-      color: "border-blue-500",
     },
     {
-      type: "Internship",
+      tag: "work",
+      label: "internship",
+      hash: "b12d4e8",
       title: "Artificial Intelligence Intern",
       organization: "Martvalley Online Pvt. Ltd",
-      period: "May 2025 – July 2025",
+      period: "May 2025 — Jul 2025",
       description:
-        "Contributed real-time AI modules across 5+ development projects, cutting end-to-end processing latency by 30% and improving system throughput by 25%. Optimised ML training workflows and integrated models into production environments. Collaborated with cross-functional teams on pipelines processing 5,000+ images per week, raising model accuracy by 5%.",
+        "Contributed real-time AI modules across 5+ development projects, cutting end-to-end processing latency by 30% and improving system throughput by 25%. Optimised ML training workflows and integrated models into production. Collaborated on pipelines processing 5,000+ images per week, raising model accuracy by 5%.",
       icon: Cpu,
-      color: "border-purple-500",
     },
     {
-      type: "Internship",
+      tag: "security",
+      label: "internship",
+      hash: "e5c018a",
       title: "Cyber Security Analyst Intern",
-      organization: "IBM (IBM Career Education Program) – Remote",
-      period: "May 2025 – June 2025",
+      organization: "IBM Career Education Program — Remote",
+      period: "May 2025 — Jun 2025",
       description:
-        "Analysed simulated cyber threats and applied defensive strategies to secure system environments. Utilised industry-standard tools to monitor, detect, and report vulnerabilities in network infrastructures. Collaborated in virtual labs powered by IBM Developer Skills Network to solve real-world cybersecurity challenges. Gained hands-on experience with malware analysis, threat intelligence, and penetration testing basics.",
+        "Analysed simulated cyber threats and applied defensive strategies to secure system environments. Used industry-standard tools to monitor, detect, and report network vulnerabilities. Gained hands-on experience with malware analysis, threat intelligence, and penetration testing basics.",
       icon: Shield,
-      color: "border-green-500",
-    },
-    {
-      type: "Education",
-      title: "Senior Secondary (PCM + Computer Science)",
-      organization: "Kendriya Vidyalaya",
-      period: "Graduated: 2023",
-      description:
-        "Completed senior secondary education with Physics, Chemistry, Mathematics, and Computer Science. Built strong foundation in programming and analytical thinking.",
-      icon: Server,
-      color: "border-cyan-500",
     },
   ];
-
-  // Split by type rather than maintaining two parallel arrays, so the columns
-  // stay in sync with the source data. Array order is preserved, which keeps
-  // the newest qualification at the top of each timeline.
-  const education = experiences.filter((item) => item.type === "Education");
-  const work = experiences.filter((item) => item.type !== "Education");
 
   return (
     // Transparent ground: the page sits on the wave canvas mounted in
@@ -265,8 +243,6 @@ export default function Portfolio() {
             isScrolled ? "px-4 py-2 sm:px-6" : "px-4 py-2 sm:px-8 sm:py-3"
           }`}
         >
-          <CrystalTrailSurface />
-
           {/* Labels are hidden below sm: five labelled items measure roughly
               590px, which does not fit a 375px viewport. Icons only there. */}
           <div className="relative z-10 flex space-x-5 sm:space-x-8">
@@ -421,14 +397,7 @@ export default function Portfolio() {
       {/* Skills Section, rendered on the parallax layers. ParallaxComponent
           owns the <section id="skills"> element so nav anchors and the section
           dots still resolve to it. */}
-      <ParallaxComponent
-        id="skills"
-        background={
-          // The component's own Aurora preset, unmodified: #0a001a / #1a0b2e /
-          // #f20089 at its shipped rotation, scale, speed and Edge shape.
-          <AnimatedGradient config={{ preset: "Aurora" }} />
-        }
-      >
+      <ParallaxComponent id="skills">
         <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
@@ -502,63 +471,49 @@ export default function Portfolio() {
           </Reveal>
         </Reveal>
       </section>
-      {/* Experience Section */}
+      {/* Experience Section — rendered as a terminal "git log" of my career */}
       <section id="experience" className="py-14 sm:py-20 relative">
-        <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal stagger className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
-              <span className="text-red-400">&gt;</span> Experience & Education
+              <span className="text-red-400">&gt;</span> Experience &amp; Education
             </h2>
             <p className="text-base sm:text-xl text-gray-400 font-mono">
               My professional and academic background
             </p>
           </div>
 
-          {/* Two columns above 768px, Education stacked above Experience below */}
-          <div className="grid md:grid-cols-2 gap-10 md:gap-8 lg:gap-12">
-            {[
-              { emoji: "🎓", label: "Education", items: education },
-              { emoji: "💼", label: "Experience", items: work },
-            ].map((column) => (
-              <div key={column.label}>
-                <h3 className="text-lg sm:text-xl font-bold text-white font-mono mb-6">
-                  <span className="text-cyan-400">&gt;</span>{" "}
-                  <span aria-hidden="true">{column.emoji}</span> {column.label}
-                </h3>
+          <div className="career-term">
+            {/* Faux window title bar */}
+            <div className="career-term__bar" aria-hidden="true">
+              <span className="career-term__dot career-term__dot--red" />
+              <span className="career-term__dot career-term__dot--amber" />
+              <span className="career-term__dot career-term__dot--green" />
+              <span className="career-term__file">
+                ritik@portfolio:~$ git log --oneline career/
+              </span>
+            </div>
 
-                <Reveal as="ol" stagger className="timeline">
-                  {column.items.map((item, index) => (
-                    <li key={index} className="timeline__item">
-                      <div
-                        className={`bg-gray-900/50 backdrop-blur-sm rounded-lg p-5 border-l-4 ${item.color} hover:bg-gray-800/50 transition-all duration-300`}
-                      >
-                        <div className="flex items-start space-x-3 mb-2">
-                          <item.icon className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
-                          <h4 className="text-base sm:text-lg font-semibold text-white font-mono leading-snug">
-                            {item.title}
-                          </h4>
-                        </div>
+            <Reveal as="ol" stagger className="career-log">
+              {experiences.map((item, index) => (
+                <li key={index} className="career-log__entry">
+                  <span className="career-log__node" aria-hidden="true" />
 
-                        <p className="text-cyan-400 font-medium mb-2 font-mono text-sm">
-                          {item.organization}
-                        </p>
+                  <div className="career-log__head">
+                    <span className="career-log__hash">{item.hash}</span>
+                    <span className={`career-log__tag career-log__tag--${item.tag}`}>
+                      <item.icon className="h-3 w-3" />
+                      {item.label}
+                    </span>
+                    <span className="career-log__date">{item.period}</span>
+                  </div>
 
-                        <Badge
-                          variant="outline"
-                          className="border-gray-600 text-gray-300 bg-gray-800/50 font-mono text-xs w-fit mb-3"
-                        >
-                          {item.period}
-                        </Badge>
-
-                        <p className="text-gray-400 font-mono text-xs sm:text-sm leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </Reveal>
-              </div>
-            ))}
+                  <h3 className="career-log__title">{item.title}</h3>
+                  <p className="career-log__org">{item.organization}</p>
+                  <p className="career-log__desc">{item.description}</p>
+                </li>
+              ))}
+            </Reveal>
           </div>
         </Reveal>
       </section>

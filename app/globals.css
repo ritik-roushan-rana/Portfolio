@@ -762,66 +762,177 @@
 }
 
 /* ===========================================================================
-   Experience & Education timeline
+   Experience & Education — terminal "git log"
    ---------------------------------------------------------------------------
-   Vertical rule with connector dots down each column. Uses the existing cyan
-   (#22d3ee) and page ground (#030712) only - no new colours.
+   A faux terminal window whose body is a commit history: a vertical graph rail
+   with commit nodes, a short SHA, a coloured ref tag, and the entry body. Fits
+   the site's mono/hacker aesthetic instead of a generic two-column card grid.
    =========================================================================== */
 
-.timeline {
-  position: relative;
-  margin: 0;
-  /* Leaves room for the rule and dots to the left of each card. */
-  padding: 0 0 0 1.75rem;
-  list-style: none;
-}
-
-/* The rule itself, faded at both ends so it does not stop abruptly. */
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: 0.3125rem;
-  top: 0.6rem;
-  bottom: 0.6rem;
-  width: 1px;
+.career-term {
+  max-width: 46rem;
+  margin: 0 auto;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 0.85rem;
   background: linear-gradient(
-    to bottom,
-    rgba(34, 211, 238, 0.04),
-    rgba(34, 211, 238, 0.35) 10%,
-    rgba(34, 211, 238, 0.35) 90%,
-    rgba(34, 211, 238, 0.04)
+    180deg,
+    rgba(8, 12, 24, 0.92),
+    rgba(3, 7, 18, 0.94)
   );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.timeline__item {
-  position: relative;
+/* Window chrome */
+.career-term__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
 }
-
-.timeline__item + .timeline__item {
-  margin-top: 1.5rem;
-}
-
-/* Connector dot. Negative left walks back out of .timeline's padding to land
-   centred on the 1px rule; the solid fill masks the line behind it. */
-.timeline__item::before {
-  content: "";
-  position: absolute;
-  left: -1.75rem;
-  top: 0.6rem;
+.career-term__dot {
   width: 11px;
   height: 11px;
   border-radius: 9999px;
-  background-color: #030712;
-  border: 2px solid #22d3ee;
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.45);
+}
+.career-term__dot--red {
+  background: #ff5f57;
+}
+.career-term__dot--amber {
+  background: #febc2e;
+}
+.career-term__dot--green {
+  background: #28c840;
+}
+.career-term__file {
+  margin-left: 0.65rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@media (max-width: 767px) {
-  .timeline {
-    padding-left: 1.5rem;
-  }
+/* Commit history */
+.career-log {
+  list-style: none;
+  margin: 0;
+  padding: 1.4rem 1.4rem 1.6rem;
+  position: relative;
+}
+.career-log__entry {
+  position: relative;
+  padding-left: 1.75rem;
+}
+.career-log__entry + .career-log__entry {
+  margin-top: 1.75rem;
+}
 
-  .timeline__item::before {
-    left: -1.5rem;
+/* Graph rail: each entry draws the segment down to the next node. */
+.career-log__entry::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 0.55rem;
+  bottom: -1.75rem;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(34, 211, 238, 0.5),
+    rgba(34, 211, 238, 0.15)
+  );
+}
+.career-log__entry:last-child::before {
+  display: none;
+}
+
+.career-log__node {
+  position: absolute;
+  left: 0;
+  top: 0.3rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #030712;
+  border: 2px solid #22d3ee;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+}
+
+.career-log__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+.career-log__hash {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: #eab308;
+  letter-spacing: 0.02em;
+}
+.career-log__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.08rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+}
+.career-log__tag--edu {
+  color: #22d3ee;
+  border-color: rgba(34, 211, 238, 0.4);
+  background: rgba(34, 211, 238, 0.08);
+}
+.career-log__tag--work {
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.4);
+  background: rgba(168, 85, 247, 0.08);
+}
+.career-log__tag--security {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.08);
+}
+.career-log__date {
+  margin-left: auto;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+.career-log__title {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+.career-log__org {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: #22d3ee;
+  margin-bottom: 0.45rem;
+}
+.career-log__desc {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+@media (max-width: 640px) {
+  .career-log__date {
+    margin-left: 0;
+    width: 100%;
   }
 }

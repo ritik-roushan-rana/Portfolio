@@ -1,13 +1,11 @@
-import CrystalTrailBackground from '@/components/ui/crystal-trail-background'
 import Portfolio from '@/components/Portfolio'
 
 export default function Page() {
   return (
-    // Site-wide ground. The canvas paints its own opaque #0a0514 and fades it
-    // each frame, which is what leaves the cursor trail, so it has to be the
-    // bottom layer for the whole page rather than a per-section effect.
-    <CrystalTrailBackground>
+    // Site-wide ground. Plain opaque #0a0514 layer that the whole page sits on.
+    // The cursor-trail canvas that used to live here has been removed.
+    <div className="relative min-h-screen w-full overflow-hidden" style={{ backgroundColor: '#0a0514' }}>
       <Portfolio />
-    </CrystalTrailBackground>
+    </div>
   )
 }
