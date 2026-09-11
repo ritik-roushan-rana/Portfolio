@@ -433,43 +433,22 @@ export default function Portfolio() {
             <div>
               <p className="eyebrow mb-10">01 — About</p>
 
-              <Statement text="I turn messy data into models that hold up outside the notebook." />
+              <Statement text="I build machine learning models and get them working in the real world." />
 
               <Reveal stagger className="mt-10 max-w-xl space-y-5">
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  I&apos;m a machine learning engineer and Computer Science
-                  student at VIT Vellore. My work sits where{" "}
-                  <span className="serif-accent">deep reinforcement learning</span>,
-                  computer vision and classical ML meet real systems: agents
-                  that rebalance portfolios, detectors that spot emergency
-                  vehicles in live video, gradient-boosted models that flag
-                  fraud at scale.
+                  I&apos;m a CS student at VIT Vellore working on{" "}
+                  <span className="serif-accent">deep reinforcement learning</span>{" "}
+                  and computer vision. I&apos;ve trained RL agents to
+                  rebalance stock portfolios, built a detector for emergency
+                  vehicles in traffic video, and an XGBoost model for fraud
+                  detection. Mostly Python, PyTorch and Stable-Baselines3.
                 </p>
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  The part I care about most is what happens after training —
-                  clean data pipelines, honest evaluation, and models that
-                  ship. At Martvalley I took real-time AI modules to production
-                  across 5+ projects, cutting end-to-end latency by 30% and
-                  raising accuracy on a 5,000-images-a-week pipeline. Python,
-                  PyTorch, XGBoost and Stable-Baselines3 are the tools I reach
-                  for first.
-                </p>
-                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  I got into this by wanting to know <em>why</em> a model was
-                  right, not just that it was — so I spend as much time on
-                  feature analysis, error slicing and calibration as on
-                  architecture. The questions I keep coming back to: can an
-                  agent learn a policy in a market it has never seen, how far
-                  can a vision model be trimmed before it stops seeing, and how
-                  do you make a prediction someone can actually act on.
-                </p>
-                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  Based in New Delhi, studying in Vellore, and currently open
-                  to{" "}
-                  <span className="serif-accent">ML engineering roles and
-                  internships</span>{" "}
-                  — research-flavoured or production-heavy, as long as the
-                  data is real.
+                  At Martvalley I put real-time AI modules into production and
+                  worked on an image pipeline handling 5,000+ images a week.
+                  I care about clean data, proper evaluation, and models that
+                  actually ship. Open to ML roles and internships.
                 </p>
                 <a
                   className="link-u inline-block font-mono text-xs uppercase tracking-[0.16em]"
