@@ -370,7 +370,7 @@ const SOCIALS = [
 ];
 
 const RESUME_URL =
-  "https://drive.google.com/file/d/1vhBi2CfbaQDo-NzdqEiLRe8hky1TdnFA/view?usp=sharing";
+  "https://drive.google.com/file/d/1624hR6m0SE-CpaeSzeEqpf6SO_tRj1FD/view?usp=sharing";
 
 export default function Portfolio() {
   return (
@@ -433,21 +433,43 @@ export default function Portfolio() {
             <div>
               <p className="eyebrow mb-10">01 — About</p>
 
-              <Statement text="I build things that hold up when someone is actively trying to break them." />
+              <Statement text="I turn messy data into models that hold up outside the notebook." />
 
               <Reveal stagger className="mt-10 max-w-xl space-y-5">
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  I&apos;m a Computer Science student specialising in
-                  information security, splitting my time between shipping
-                  interfaces and taking them apart. Flutter and Next.js on one
-                  side; honeypots, log analysis and threat intelligence on the
-                  other.
+                  I&apos;m a machine learning engineer and Computer Science
+                  student at VIT Vellore. My work sits where{" "}
+                  <span className="serif-accent">deep reinforcement learning</span>,
+                  computer vision and classical ML meet real systems: agents
+                  that rebalance portfolios, detectors that spot emergency
+                  vehicles in live video, gradient-boosted models that flag
+                  fraud at scale.
                 </p>
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  Most recently I worked on real-time AI modules at Martvalley
-                  and trained as a{" "}
-                  <span className="serif-accent">security analyst</span> through
-                  IBM&apos;s career education programme.
+                  The part I care about most is what happens after training —
+                  clean data pipelines, honest evaluation, and models that
+                  ship. At Martvalley I took real-time AI modules to production
+                  across 5+ projects, cutting end-to-end latency by 30% and
+                  raising accuracy on a 5,000-images-a-week pipeline. Python,
+                  PyTorch, XGBoost and Stable-Baselines3 are the tools I reach
+                  for first.
+                </p>
+                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
+                  I got into this by wanting to know <em>why</em> a model was
+                  right, not just that it was — so I spend as much time on
+                  feature analysis, error slicing and calibration as on
+                  architecture. The questions I keep coming back to: can an
+                  agent learn a policy in a market it has never seen, how far
+                  can a vision model be trimmed before it stops seeing, and how
+                  do you make a prediction someone can actually act on.
+                </p>
+                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
+                  Based in New Delhi, studying in Vellore, and currently open
+                  to{" "}
+                  <span className="serif-accent">ML engineering roles and
+                  internships</span>{" "}
+                  — research-flavoured or production-heavy, as long as the
+                  data is real.
                 </p>
                 <a
                   className="link-u inline-block font-mono text-xs uppercase tracking-[0.16em]"
