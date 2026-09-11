@@ -2,154 +2,2532 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* ===========================================================================
+   DESIGN TOKENS
+   ---------------------------------------------------------------------------
+   One near-black ground, a warm off-white ink, and exactly two accents. The
+   restraint is the point: everything that is not ink or muted grey is either
+   the acid accent (interactive / live) or the ember (editorial emphasis), so
+   colour always means something.
+   =========================================================================== */
 
-  /* No `scroll-behavior: smooth` here on purpose. Lenis (mounted by
-     components/ui/parallax-scrolling.tsx) drives scrolling itself, and CSS
-     smooth scrolling on the root element fights it. In-page jumps go through
-     lib/smooth-scroll.ts, which uses Lenis when active and falls back to
-     native smooth scrolling for reduced-motion visitors. */
+:root {
+  /* Warm dusk ground. Nothing here is neutral grey: the darks carry plum, the
+     lights carry cream, so the whole page reads as one warm light source
+     rather than a black page with colour dropped on top. */
+  --ground: #120a14;
+  --ground-deep: #0c060e;
+  --ground-band: #1b1019;
+  /* Translucent plum for anything that sits above the ground as a surface. */
+  --raised: rgba(72, 38, 56, 0.42);
 
-  body {
-    @apply bg-background text-foreground;
-  }
+  --ink: #f2e6bd;
+  --muted: #ab9382;
+  --line: rgba(242, 230, 189, 0.16);
+
+  /* Hot orange for fills, glows and rules. It is bright but not light, so it
+     is never used for small text — that job goes to the gold. */
+  --accent: #eb4400;
+  --accent-lift: #ff7a3d;
+  --gold: #ffc46b;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --shell: 84rem;
 }
 
-/* Companions to the keyframe animations declared in tailwind.config.js.
-   These set properties the `animation` shorthand cannot express. */
-@layer utilities {
-  /* The gradient needs room to travel for `animate-gradient` to be visible. */
-  .animate-gradient {
-    background-size: 200% 200%;
+@layer base {
+  * {
+    border-color: var(--line);
   }
 
-  /* Delay the scan sweep so it trails the hero fade-in. */
-  .animate-scan {
-    animation-delay: 2s;
+  html {
+    /* Lenis drives scrolling (components/site/SmoothScroll.jsx); CSS smooth
+       scrolling on the root fights it. In-page jumps go through
+       lib/smooth-scroll.ts, which falls back to native for reduced motion. */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #120a14;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 }
 
 /* ===========================================================================
-   Interactive layer
-   ---------------------------------------------------------------------------
-   Written as plain CSS rather than Tailwind @layer utilities on purpose:
-   utilities are purged unless the exact class name appears in scanned markup,
-   and these rules are keyed off data attributes and parent state.
-
-   The binary 0/1 tiles and the cursor-following spotlight that used to live
-   here were removed, along with the PointerTracker that fed them. Cursor
-   reaction now comes from the canvas backgrounds in components/ui.
-
-   Accent palette: #00ff41 (green) and #22d3ee (teal), matching tailwind.config.
+   TYPE SCALE
    =========================================================================== */
 
-/* --- 2. Typewriter caret ------------------------------------------------- */
-
-.typing-caret {
-  color: #22d3ee;
+/* Oversized editorial display. Clamped against the viewport rather than
+   stepped through breakpoints, so a single rule holds from 320px to 4K. */
+.display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-weight: 400;
-  animation: caret-blink 1s steps(1, end) infinite;
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
 }
 
-.typing-caret--resting {
-  animation-duration: 1.4s;
+.display--xl {
+  font-size: clamp(3.4rem, 15vw, 13.5rem);
 }
 
-@keyframes caret-blink {
-  0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
+.display--lg {
+  font-size: clamp(2.6rem, 8vw, 6.5rem);
 }
 
-/* --- 3. Profile photo radar sweep --------------------------------------- */
-
-/* Radar sweep travelling around the ring. The conic gradient supplies the
-   comet tail; the radial mask cuts it down to an annulus. */
-.profile-radar {
-  position: absolute;
-  inset: -1.5rem;
-  border-radius: 9999px;
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg,
-    rgba(34, 211, 238, 0) 0deg,
-    rgba(34, 211, 238, 0) 240deg,
-    rgba(34, 211, 238, 0.35) 318deg,
-    rgba(0, 255, 65, 0.95) 356deg,
-    rgba(34, 211, 238, 0) 360deg
-  );
-  -webkit-mask-image: radial-gradient(
-    closest-side,
-    transparent 0 85%,
-    #000 87%,
-    #000 100%
-  );
-  mask-image: radial-gradient(
-    closest-side,
-    transparent 0 85%,
-    #000 87%,
-    #000 100%
-  );
-  animation: radar-spin 4.5s linear infinite;
+.display--md {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  line-height: 0.95;
 }
 
-@keyframes radar-spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* The serif italic is the site's one flourish: it marks the words that carry
+   the voice, and it is the only place the ember colour appears in body copy. */
+.serif-accent {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: var(--gold);
 }
 
-/* --- 4. Magnetic buttons + click ripple --------------------------------- */
-
-.magnetic {
+/* Numbered mono micro-labels that key every section. */
+.eyebrow {
   display: inline-flex;
-  transition: transform 350ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.lede {
+  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  line-height: 1.55;
+  color: rgba(242, 230, 189, 0.86);
+  max-width: 46ch;
+}
+
+/* Only the hero's lede sits over the sky; elsewhere the halo is unnecessary. */
+.hero .lede {
+  text-shadow: 0 1px 12px rgba(12, 5, 12, 0.8);
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: clamp(5rem, 12vh, 9rem);
+  isolation: isolate;
+}
+
+/* The page's light is one continuous field painted on <main>, not a wash per
+   section: two wide, very soft glows placed by percentage of the whole page,
+   so there is no edge anywhere for a section boundary to show against. They
+   start below the hero, whose scrim already lands on the plain ground. */
+main {
+  position: relative;
+  background:
+    radial-gradient(
+      60% 14% at 12% 34%,
+      rgba(235, 68, 0, 0.07),
+      transparent 70%
+    ),
+    radial-gradient(
+      70% 16% at 88% 66%,
+      rgba(147, 51, 79, 0.12),
+      transparent 70%
+    ),
+    radial-gradient(
+      60% 12% at 20% 92%,
+      rgba(235, 68, 0, 0.05),
+      transparent 70%
+    );
+}
+
+/* A section that is a screen in its own right: edge to edge (its washes run
+   the full viewport width, not the shell's), at least one viewport tall, with
+   its content — in a `.shell` of its own — centred in that height. */
+.section--full {
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Hairline section divider that draws itself in as the section arrives. */
+.rule {
+  height: 1px;
+  background: var(--line);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 1.2s var(--ease);
+}
+
+.rule.is-in {
+  transform: scaleX(1);
+}
+
+/* ===========================================================================
+   GRAIN + VIGNETTE
+   ---------------------------------------------------------------------------
+   A fixed film-grain plate over everything. It keeps the large flat black
+   fields from banding and gives the page a photographic, non-digital feel.
+   =========================================================================== */
+
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.038;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-drift 700ms steps(1) infinite;
+}
+
+@keyframes grain-drift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-2%, -2%); }
+  100% { transform: translate(3%, 1%); }
+}
+
+/* Neutral: a faint darkening of the corners and nothing else. The coloured
+   glows this used to carry were fixed to the viewport, so they sat as one
+   orange haze over the painting and then over every section in turn, and
+   fought the page's own light. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 50%,
+    transparent 60%,
+    rgba(12, 5, 12, 0.28) 100%
+  );
+}
+
+/* ===========================================================================
+   CUSTOM CURSOR
+   ---------------------------------------------------------------------------
+   Two elements: a hard dot that tracks the pointer exactly, and a lagging ring
+   that eases toward it. The ring grows and inverts over anything marked
+   data-cursor, which is what makes links feel physical.
+   =========================================================================== */
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 9999px;
   will-change: transform;
 }
 
-.magnetic__button {
-  position: relative;
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--accent);
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 1px solid rgba(242, 230, 189, 0.45);
+  transition:
+    width 350ms var(--ease),
+    height 350ms var(--ease),
+    margin 350ms var(--ease),
+    background-color 350ms var(--ease),
+    border-color 350ms var(--ease);
+}
+
+.cursor-ring[data-state="hover"] {
+  width: 74px;
+  height: 74px;
+  margin: -37px 0 0 -37px;
+  background: rgba(235, 68, 0, 0.14);
+  border-color: var(--accent);
+}
+
+/* The label rides inside the enlarged ring for cards that announce an action
+   ("VIEW", "OPEN"). Empty label renders nothing. */
+.cursor-ring__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.cursor-ring[data-state="hover"] .cursor-ring__label {
+  opacity: 1;
+}
+
+/* Hidden entirely on touch and for reduced motion — the native cursor is
+   better than a laggy imitation. */
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   PRELOADER
+   ---------------------------------------------------------------------------
+   A counter to 100 over a black plate, then the plate splits into columns that
+   wipe upward on staggered delays, uncovering the hero already mid-reveal.
+   =========================================================================== */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: var(--gutter);
+  pointer-events: none;
+}
+
+.preloader__panels {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: -1;
+}
+
+.preloader__panel {
+  flex: 1;
+  background: var(--ground-deep);
+  transform: translateY(0);
+  transition: transform 1s var(--ease);
+}
+
+.preloader--out .preloader__panel {
+  transform: translateY(-101%);
+}
+
+.preloader--out .preloader__panel:nth-child(1) { transition-delay: 0ms; }
+.preloader--out .preloader__panel:nth-child(2) { transition-delay: 60ms; }
+.preloader--out .preloader__panel:nth-child(3) { transition-delay: 120ms; }
+.preloader--out .preloader__panel:nth-child(4) { transition-delay: 180ms; }
+.preloader--out .preloader__panel:nth-child(5) { transition-delay: 240ms; }
+
+.preloader__name,
+.preloader__count {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: opacity 400ms ease;
+}
+
+.preloader__count {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(4rem, 16vw, 13rem);
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+  color: var(--ink);
+}
+
+.preloader--out .preloader__name,
+.preloader--out .preloader__count {
+  opacity: 0;
+  transition-duration: 300ms;
+}
+
+/* Progress hairline along the very bottom of the plate. */
+.preloader__bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 180ms linear, opacity 300ms ease;
+}
+
+.preloader--out .preloader__bar {
+  opacity: 0;
+}
+
+/* ===========================================================================
+   MASKED LINE REVEAL
+   ---------------------------------------------------------------------------
+   Each line sits in an overflow-hidden box and slides up from below it, so the
+   text appears to be drawn out of the page rather than faded onto it.
+   =========================================================================== */
+
+.mask-line {
+  display: block;
   overflow: hidden;
 }
 
-.magnetic__ripple {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.45);
-  pointer-events: none;
-  animation: ripple-out 620ms ease-out forwards;
+.mask-line > span {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 1.05s var(--ease);
 }
 
-@keyframes ripple-out {
+.mask-line.is-in > span {
+  transform: translateY(0);
+}
+
+/* ===========================================================================
+   NAVIGATION — top bar + right-edge compass rail
+   =========================================================================== */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem var(--gutter);
+  /* Plain white with a shadow rather than `mix-blend-mode: difference`: over
+     the painting's white clouds, difference inverted the text to near-black
+     and the clock vanished into the top-right cumulus. */
+  text-shadow: 0 1px 14px rgba(12, 5, 12, 0.7), 0 0 2px rgba(12, 5, 12, 0.5);
+  transition: transform 500ms var(--ease);
+}
+
+/* The bar retracts while scrolling down and returns on scroll up, so long
+   reading passages are uninterrupted. */
+.topbar--hidden {
+  transform: translateY(-120%);
+}
+
+.topbar__mark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+@keyframes mark-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+.topbar__clock {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+/* On a phone the wordmark and the clock together overflow one line at the
+   desktop tracking, so both tighten rather than wrapping. */
+@media (max-width: 640px) {
+  .topbar {
+    padding-block: 1.1rem;
+  }
+
+  .topbar__mark,
+  .topbar__clock {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+}
+
+/* --- Compass rail -------------------------------------------------------- */
+
+.compass {
+  position: fixed;
+  top: 50%;
+  right: clamp(0.9rem, 2vw, 2rem);
+  z-index: 80;
+  transform: translateY(-50%);
+}
+
+/* Hidden while the hero is in view: nothing to navigate to yet, and it would
+   overlap the panel pinned to the right edge. */
+.compass--idle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.compass {
+  transition: opacity 500ms var(--ease);
+}
+
+.compass__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compass__item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 300ms var(--ease);
+}
+
+.compass__label {
+  opacity: 0;
+  transform: translateX(8px);
+  transition:
+    opacity 300ms var(--ease),
+    transform 300ms var(--ease);
+}
+
+.compass__item:hover .compass__label,
+.compass__item:focus-visible .compass__label,
+.compass__item--active .compass__label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* The tick grows from 14px to 34px and takes the accent when its section is in
+   view — a length readout rather than another dot. */
+.compass__tick {
+  display: block;
+  width: 14px;
+  height: 1px;
+  flex: none;
+  background: currentColor;
+  transition:
+    width 400ms var(--ease),
+    background-color 300ms var(--ease);
+}
+
+.compass__item:hover,
+.compass__item:focus-visible,
+.compass__item--active {
+  color: var(--ink);
+}
+
+.compass__item--active {
+  color: var(--gold);
+}
+
+.compass__item--active .compass__tick {
+  width: 34px;
+}
+
+@media (max-width: 640px) {
+  .compass {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   MARK
+   ---------------------------------------------------------------------------
+   See components/site/Mark.jsx. Sized purely by the width its caller gives it,
+   and never boxed: the same glyph is the header logo and the hero symbol.
+   =========================================================================== */
+
+.mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mark__wire {
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+.mark__node {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+/* The one filled node is the output — the value the model actually produces —
+   so the accent marks the result rather than decorating the glyph. */
+.mark__node--out {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.mark__pulse {
+  stroke: var(--gold);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  /* One short dash on a long gap, swept the length of the edge. */
+  stroke-dasharray: 3 60;
+  stroke-dashoffset: 63;
+  animation: mark-signal 2.8s ease-in-out infinite;
+}
+
+@keyframes mark-signal {
+  0% {
+    stroke-dashoffset: 63;
+  }
+  55%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The header logo, sitting where the pulsing dot used to. */
+.topbar__mark .mark {
+  width: 1.15rem;
+  flex: none;
+  color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark__pulse {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   HERO
+   ---------------------------------------------------------------------------
+   A painting, edge to edge, exactly one viewport tall. The only chrome is the
+   nav at the top and a caption row pinned to the foot; the picture is the
+   hero, the text is the label under it.
+   =========================================================================== */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-block: 7rem 2.25rem;
+  color: #fff;
+}
+
+.painting {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: #3f7fd0;
+  pointer-events: none;
+}
+
+.painting__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Keep the horizon in frame: crop from the sky first on tall viewports,
+     never from the meadow. */
+  object-position: 50% 62%;
+  animation: painting-in 1.6s var(--ease) both;
+}
+
+@keyframes painting-in {
   from {
-    opacity: 0.7;
-    transform: scale(1);
+    opacity: 0;
+    transform: scale(1.04);
   }
   to {
-    opacity: 0;
-    transform: scale(22);
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* --- 6. Scroll reveal + progress bar ------------------------------------ */
+/* One scrim, low on the picture, so the caption is legible against the grass
+   and the meadow settles into the page ground instead of stopping at a line.
+   It is deliberately shallow: the point of the section is that the painting
+   is uncovered. */
+/* A matching, much lighter scrim across the top keeps the header legible
+   where the painting is brightest (the sky). */
+.painting::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 22%;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 5, 12, 0.42) 0%,
+    rgba(12, 5, 12, 0.18) 55%,
+    transparent 100%
+  );
+}
+
+.painting__fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(18, 10, 20, 0.18) 34%,
+    rgba(18, 10, 20, 0.5) 64%,
+    rgba(18, 10, 20, 0.82) 86%,
+    var(--ground) 100%
+  );
+}
+
+/* The caption row: name and role on the left, the way down on the right. */
+.hero__foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem 3rem;
+  width: 100%;
+}
+
+.hero__plate {
+  max-width: 44rem;
+}
+
+.hero__name {
+  font-size: clamp(2.4rem, 5.6vw, 5.4rem);
+  line-height: 0.98;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(12, 5, 12, 0.45);
+}
+
+.hero__role {
+  margin-top: 1rem;
+  max-width: 34rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.78rem, 1.05vw, 0.9rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+  text-shadow: 0 1px 12px rgba(12, 5, 12, 0.55);
+}
+
+/* Pill button in the reference's spirit: a white outline on the picture,
+   filling on hover. */
+.dive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.8rem 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 9999px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(18, 10, 20, 0.28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background-color 260ms var(--ease),
+    color 260ms var(--ease),
+    border-color 260ms var(--ease),
+    transform 260ms var(--ease);
+}
+
+.dive:hover {
+  background: #fff;
+  border-color: #fff;
+  color: #120a14;
+  transform: translateY(-2px);
+}
+
+.dive svg {
+  transition: transform 260ms var(--ease);
+}
+
+.dive:hover svg {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-bottom: 1.75rem;
+  }
+
+  .hero__foot {
+    align-items: flex-start;
+  }
+}
+
+/* ===========================================================================
+   STATEMENT — word-by-word scroll illumination
+   =========================================================================== */
+
+.statement {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.8rem, 4.6vw, 4rem);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+
+.statement__word {
+  display: inline-block;
+  margin-right: 0.28em;
+  color: rgba(242, 230, 189, 0.16);
+  transition: color 420ms var(--ease);
+}
+
+.statement__word--lit {
+  color: var(--ink);
+}
+
+/* ===========================================================================
+   PROJECT DECK
+   ---------------------------------------------------------------------------
+   See components/site/ProjectDeck.jsx. The wrapper reserves one viewport of
+   scroll per project; the stage inside it is pinned for that whole run and the
+   cards are dealt across it.
+
+   Everything the scroll handler touches is transform, opacity and one custom
+   property (--tint), so the whole effect stays on the compositor.
+   =========================================================================== */
+
+.deck {
+  position: relative;
+  /* One viewport per project. The last card has no successor to deal to, so
+     the usable travel is (count - 1) viewports. */
+  height: calc(100svh * var(--deck-count));
+}
+
+.deck__stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Must clear the stack's rise: cards behind the front one sit up to
+     MAX_DEPTH * RISE_STEP = 42px higher (lib/deck-layout.js), and at a smaller
+     gap the deepest card slid under the index rail's text. */
+  gap: clamp(3.5rem, 6.5vh, 4.5rem);
+  height: 100svh;
+  padding-inline: var(--gutter);
+  overflow: hidden;
+}
+
+/* --- "See all" panel ----------------------------------------------------- */
+
+/* Slides in from the right over the whole page. Fixed rather than absolute,
+   and rendered outside .deck__stage — the cards declare will-change:transform,
+   which would otherwise make "fixed" mean "fixed inside a card". */
+.allp {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.allp--open {
+  pointer-events: auto;
+}
+
+.allp__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(8, 4, 10, 0.72);
+  opacity: 0;
+  transition: opacity 520ms var(--ease);
+}
+
+.allp--open .allp__scrim {
+  opacity: 1;
+}
+
+.allp__panel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  /* Full page: the slide is the transition, not the layout. */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--ground);
+  box-shadow: -40px 0 90px rgba(0, 0, 0, 0.6);
+  /* Transform, not `right`, so the slide is composited. */
+  transform: translateX(100%);
+  transition: transform 620ms var(--ease);
+  will-change: transform;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.allp--open .allp__panel {
+  transform: translateX(0);
+}
+
+.allp__bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding: 1.25rem var(--gutter);
+  background: var(--ground);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Keeps the close control paired with a hint: at full width there is no
+   backdrop left to click, so the ways out have to be visible. */
+.allp__esc {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.allp__key {
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  color: rgba(242, 230, 189, 0.8);
+}
+
+@media (max-width: 640px) {
+  .allp__esc span:first-child {
+    display: none;
+  }
+}
+
+.allp__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    color 260ms var(--ease),
+    background-color 260ms var(--ease),
+    border-color 260ms var(--ease);
+}
+
+.allp__close:hover {
+  color: #120a14;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.allp__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: clamp(1rem, 2vw, 1.6rem);
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 3vw, 2.25rem) var(--gutter) clamp(3rem, 8vh, 5rem);
+  list-style: none;
+}
+
+/* Four across on a desktop, stated rather than inferred: auto-fit would give
+   three at some widths and four at others depending on the gutter, and the
+   whole point of this panel is seeing the set side by side. */
+@media (min-width: 1100px) {
+  .allp__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.allp__cell {
+  display: flex;
+  flex-direction: column;
+}
+
+/* One ratio for every tile, so the grid reads as an even set rather than rows
+   of different heights. */
+.allp__art {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  margin-bottom: 0.75rem;
+  display: grid;
+  place-items: center;
+}
+
+/* Every tile is filled, never letterboxed. A portrait phone shot is anchored
+   to its top so the header and headline figure survive the crop; a landscape
+   capture is centred, where its content sits. */
+.allp__img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+.allp__art--wide .allp__img {
+  object-position: center;
+}
+
+.allp__glyph {
+  width: 2rem;
+  height: 2rem;
+  color: rgba(18, 10, 20, 0.8);
+}
+
+.allp__num {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+
+.allp__title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.15rem, 1.5vw, 1.45rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.allp__meta {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(242, 230, 189, 0.7);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Clamped to four lines: the summaries differ a lot in length, and without a
+   cap one tile's paragraph sets the row height for all four. */
+.allp__desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: rgba(242, 230, 189, 0.62);
+  margin-bottom: 0.85rem;
+}
+
+.allp__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: auto;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .allp__panel,
+  .allp__scrim {
+    transition: none;
+  }
+}
+
+/* --- Index rail ---------------------------------------------------------- */
+
+/* Pinned with the stage, so the whole body of work stays on screen while a
+   single card is in front. */
+.deck__index {
+  position: relative;
+  width: 100%;
+  max-width: var(--shell);
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.deck__index-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deck__index-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 340ms var(--ease);
+}
+
+.deck__index-item:hover {
+  color: var(--ink);
+}
+
+.deck__index-item--on {
+  color: var(--gold);
+}
+
+.deck__index-num {
+  font-size: 0.56rem;
+  opacity: 0.7;
+}
+
+/* Set apart from the numbered projects: this one is not a project. */
+.deck__index-more {
+  gap: 0.35rem;
+  color: var(--ink);
+}
+
+.deck__index-more::before {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  align-self: center;
+  margin-right: 0.35rem;
+  background: var(--line);
+}
+
+.deck__index-more:hover {
+  color: var(--accent-lift);
+}
+
+/* The active project's name is underscored by a rule that slides along the
+   row, so the set reads as one track being moved through rather than four
+   separate links. */
+.deck__index-name {
+  position: relative;
+}
+
+.deck__index-name::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.3rem;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 420ms var(--ease);
+}
+
+.deck__index-item--on .deck__index-name::after {
+  transform: scaleX(1);
+}
+
+/* Progress through the deck, driven by the front card's index. */
+.deck__index-bar {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  transform-origin: 0 50%;
+  transform: scaleX(calc(0.08 + var(--deck-progress, 0) * 0.92));
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  transition: transform 520ms var(--ease);
+}
+
+@media (max-width: 899px) {
+  /* The deck is a plain vertical list below this width — every project is
+     already visible by scrolling, so a jump-to rail is redundant chrome. */
+  .deck__index {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck__index {
+    display: none;
+  }
+}
+
+.deck__frame {
+  position: relative;
+  width: 100%;
+  max-width: var(--shell);
+  /* Shorter than before: the index rail above it now takes a slice of the
+     stage, and the card must not push the rail off the top. */
+  height: min(32rem, 66svh);
+  margin: 0 auto;
+}
+
+.deck__card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  /* Warm plum surface rather than the neutral card of the reference, so the
+     deck belongs to this palette instead of quoting the source. */
+  /* Opaque rather than translucent-plus-blur. A backdrop-filter on an element
+     that is transformed every frame has to re-sample and re-blur the backdrop
+     on each one, and at four stacked cards that was the single most expensive
+     thing in this section. The surface was already 72-96% opaque, so the blur
+     was paying a large cost for almost no visual difference. */
+  background: linear-gradient(
+    150deg,
+    rgb(74, 39, 57),
+    rgb(23, 13, 21)
+  );
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(242, 230, 189, 0.06);
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+/* Behind the front card only the top strip of the surface shows, so the
+   contents are not rendered at all (see the layout loop in ProjectDeck.jsx).
+   `visibility` rather than `display`: the galleries keep their scroll
+   position and the card keeps its size. */
+.deck__card--back .deck__art,
+.deck__card--back .deck__body {
+  visibility: hidden;
+}
+
+/* The dark wash on cards still waiting in the stack. Driven by --tint, which
+   the scroll handler sets per card from its depth. */
+.deck__tint {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  /* Solid colour faded with opacity, not an animated background-color:
+     opacity is composited, background-color repaints the whole card on every
+     frame of a scroll. No transition either — the value is already driven
+     frame by frame, so a transition only fights it. */
+  background: #09040a;
+  opacity: var(--tint, 0);
+  will-change: opacity;
+}
+
+/* --- Art panel ----------------------------------------------------------- */
+
+.deck__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.deck__glyph {
+  width: clamp(3rem, 6vw, 5rem);
+  height: clamp(3rem, 6vw, 5rem);
+  color: rgba(18, 10, 20, 0.82);
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.28));
+}
+
+/* The device frame.
+
+   Sized by *height* with the aspect ratio deriving the width, so the whole
+   device always fits the panel whatever its proportions — sizing by width left
+   it clipped 24px short of its own bottom, which read as a mistake rather than
+   a deliberate bleed, and cut the app's tab bar in half. The height leaves room
+   under it for the caption and dots. */
+.deck__shot {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  height: 78%;
+  aspect-ratio: 9 / 19;
+  transform: translateX(-50%);
+  overflow: hidden;
+  border: 1px solid rgba(242, 230, 189, 0.4);
+  border-radius: 1.6rem;
+  background: #0a0510;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 6px rgba(18, 10, 20, 0.35);
+}
+
+/* Landscape captures get a browser window instead of a phone: same hairline
+   language, but proportioned for the content rather than cropping it into a
+   9:19 slot. Positioned from the top so the caption and dots still sit under
+   it. */
+.deck__shot--browser {
+  /* Optically centred: a shade above true centre, so the space a caption row
+     needs is already there when a project has more than one screen. */
+  top: 18%;
+  height: auto;
+  width: 84%;
+  aspect-ratio: auto;
+  border-radius: 0.75rem;
+  padding-top: 1.35rem;
+}
+
+/* The window's title bar, with the three dots every desktop window has. */
+.deck__chrome {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 1.35rem;
+  padding-inline: 0.55rem;
+  background: rgba(242, 230, 189, 0.1);
+  border-bottom: 1px solid rgba(242, 230, 189, 0.16);
+}
+
+.deck__chrome i {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(242, 230, 189, 0.4);
+}
+
+/* The slides carry the aspect ratio for a browser frame, since the frame's own
+   height is content-driven. */
+.deck__shot--browser .shot__track,
+.deck__shot--browser .shot__slide {
+  height: auto;
+}
+
+.deck__shot--browser .shot__slide {
+  aspect-ratio: 16 / 9;
+}
+
+.deck__shot--browser .shot__img {
+  object-position: top center;
+}
+
+/* Native scroll-snap: real touch momentum and trackpad gestures, with no drag
+   implementation to get wrong. The scrollbar is hidden but this is a genuine
+   scroller, so keyboard and assistive tech can still move it. */
+.shot__track {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.shot__track::-webkit-scrollbar {
+  display: none;
+}
+
+.shot__slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: center;
+}
+
+.shot__img {
+  object-fit: cover;
+  /* Top-anchored, so each screen keeps its header whatever its exact height —
+     the three sources here are 880, 894 and 902px tall. */
+  object-position: top center;
+}
+
+/* --- Gallery controls ---------------------------------------------------- */
+
+.shot__foot {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transform: translateX(-50%);
+}
+
+/* Dark ink, because the wash behind these is always a light warm gradient. */
+.shot__label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(18, 10, 20, 0.75);
+}
+
+.shot__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.shot__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(18, 10, 20, 0.3);
+  cursor: pointer;
+  transition:
+    width 320ms var(--ease),
+    background-color 320ms var(--ease);
+}
+
+.shot__dot--on {
+  width: 16px;
+  background: rgba(18, 10, 20, 0.8);
+}
+
+.shot__arrow {
+  position: absolute;
+  top: 40%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(18, 10, 20, 0.55);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background-color 260ms var(--ease),
+    opacity 260ms var(--ease);
+}
+
+.shot__arrow:hover:not(:disabled) {
+  background: rgba(18, 10, 20, 0.85);
+}
+
+.shot__arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.shot__arrow--prev {
+  left: 5%;
+}
+
+.shot__arrow--next {
+  right: 5%;
+}
+
+/* Touch has the swipe itself; the arrows are for pointers that cannot. */
+@media (hover: hover) and (pointer: fine) {
+  .shot__arrow {
+    display: inline-flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot__track {
+    scroll-behavior: auto;
+  }
+}
+
+/* Contact shadow, so the device sits on the wash rather than hovering over
+   it. */
+.deck__art--wide::after {
+  bottom: 34%;
+  width: 60%;
+}
+
+.deck__art--shot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 17%;
+  width: 34%;
+  height: 4%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(18, 10, 20, 0.4);
+  filter: blur(14px);
+  pointer-events: none;
+}
+
+
+/* Faint blueprint grid over the wash, so the panel reads as a surface with
+   texture rather than a flat colour block. */
+.deck__artgrid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(18, 10, 20, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 10, 20, 0.5) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+  mask-image: radial-gradient(closest-side, #000, transparent 78%);
+  -webkit-mask-image: radial-gradient(closest-side, #000, transparent 78%);
+}
+
+/* --- Body ---------------------------------------------------------------- */
+
+.deck__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  overflow: auto;
+}
+
+.deck__index {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+}
+
+.deck__index i {
+  margin: 0 0.35rem;
+  font-style: normal;
+  color: var(--muted);
+}
+
+.deck__title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.9rem, 3.6vw, 3.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.deck__meta {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(242, 230, 189, 0.7);
+}
+
+.deck__desc {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(242, 230, 189, 0.66);
+  max-width: 46ch;
+}
+
+/* --- Stat row ------------------------------------------------------------ */
+
+.deck__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.35rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.deck__stat dt {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(242, 230, 189, 0.7);
+  margin-bottom: 0.3rem;
+}
+
+.deck__stat dd {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.deck__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding-top: 1.1rem;
+}
+
+/* --- Below the pinning breakpoint --------------------------------------- */
+
+/* No pinning and no dealing: the same markup becomes a plain vertical list, so
+   narrow screens get every project without a scroll hijack. */
+@media (max-width: 899px) {
+  .deck {
+    height: auto;
+  }
+
+  .deck__stage {
+    position: static;
+    height: auto;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .deck__frame {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: auto;
+  }
+
+  .deck__card {
+    position: relative;
+    inset: auto;
+    grid-template-columns: minmax(0, 1fr);
+    opacity: 1;
+    transform: none;
+  }
+
+  .deck__art {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Square, so a portrait device shot is big enough to read on a phone. A
+     class rather than :has(), which is not worth relying on for layout. */
+  .deck__art--shot {
+    aspect-ratio: 1 / 1;
+  }
+
+  /* A landscape window in a square panel would float in a sea of wash. */
+  .deck__art--wide {
+    aspect-ratio: 4 / 3;
+  }
+
+  .deck__body {
+    overflow: visible;
+  }
+
+  .deck__tint {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   CAREER — master–detail tabs
+   ---------------------------------------------------------------------------
+   See components/site/CareerTabs.jsx. A rail of roles down the left with a
+   timeline running through it, and the selected role opened on the right.
+   =========================================================================== */
+
+.ctabs {
+  display: grid;
+  grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+/* --- Rail ---------------------------------------------------------------- */
+
+.ctabs__rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The timeline the nodes sit on. */
+.ctabs__rail::before {
+  content: "";
+  position: absolute;
+  top: 1.1rem;
+  bottom: 1.1rem;
+  left: 5px;
+  width: 1px;
+  background: var(--line);
+}
+
+.ctabs__tab {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "org when"
+    "role role";
+  gap: 0.2rem 0.75rem;
+  padding: 1.05rem 0 1.05rem 1.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 320ms var(--ease);
+}
+
+.ctabs__tab:last-child {
+  border-bottom: 0;
+}
+
+.ctabs__tab:hover {
+  color: rgba(242, 230, 189, 0.85);
+}
+
+.ctabs__tab--on {
+  color: var(--ink);
+}
+
+/* The node on the timeline: a ring that fills and glows when selected. */
+.ctabs__node {
+  position: absolute;
+  top: 1.25rem;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 9999px;
+  border: 1px solid rgba(242, 230, 189, 0.4);
+  background: var(--ground);
+  transition:
+    border-color 320ms var(--ease),
+    background-color 320ms var(--ease),
+    box-shadow 320ms var(--ease);
+}
+
+.ctabs__tab--on .ctabs__node {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(235, 68, 0, 0.18), 0 0 14px rgba(235, 68, 0, 0.55);
+}
+
+.ctabs__org {
+  grid-area: org;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.ctabs__tab--on .ctabs__org {
+  color: var(--gold);
+}
+
+.ctabs__when {
+  grid-area: when;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.ctabs__role {
+  grid-area: role;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* --- Pane ---------------------------------------------------------------- */
+
+.ctabs__pane {
+  min-width: 0;
+  padding-top: 0.35rem;
+}
+
+/* Replayed on every selection: a short rise and fade, so the change registers
+   without the whole pane jumping. */
+.ctabs__pane--in {
+  animation: ctabs-in 480ms var(--ease) both;
+}
+
+@keyframes ctabs-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Pane header: the organisation's mark in a tile beside the kind and title. */
+.ctabs__head {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: 0.35rem;
+}
+
+.ctabs__head-text {
+  min-width: 0;
+}
+
+.ctabs__logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: rgba(242, 230, 189, 0.04);
+}
+
+.ctabs__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The mark again, small, beside the org name in the rail. */
+.ctabs__org-logo {
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-right: 0.5rem;
+  vertical-align: -0.28em;
+  object-fit: contain;
+  opacity: 0.7;
+  transition: opacity 320ms var(--ease);
+}
+
+.ctabs__tab--on .ctabs__org-logo {
+  opacity: 1;
+}
+
+.ctabs__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.ctabs__kind-sep {
+  color: var(--muted);
+}
+
+.ctabs__title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 0.7rem;
+}
+
+.ctabs__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ctabs__meta-sep {
+  color: rgba(242, 230, 189, 0.3);
+}
+
+.ctabs__points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 60ch;
+}
+
+/* Each point hangs off a short accent dash rather than a bullet, matching the
+   eyebrow's dash elsewhere on the page. */
+.ctabs__point {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(242, 230, 189, 0.66);
+}
+
+.ctabs__point::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.85rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+/* The lead-in is what makes the list skimmable: read only the bold and you
+   have the outcomes. */
+.ctabs__point strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* --- Narrow screens: the rail becomes a strip above the pane -------------- */
+
+@media (max-width: 899px) {
+  .ctabs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .ctabs__rail {
+    flex-direction: row;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+  }
+
+  .ctabs__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ctabs__rail::before {
+    display: none;
+  }
+
+  .ctabs__tab {
+    flex: none;
+    grid-template-areas:
+      "org org"
+      "role role"
+      "when when";
+    min-width: 11rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    transition:
+      color 320ms var(--ease),
+      border-color 320ms var(--ease),
+      background-color 320ms var(--ease);
+  }
+
+  .ctabs__tab:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ctabs__tab--on {
+    border-color: rgba(235, 68, 0, 0.55);
+    background: rgba(235, 68, 0, 0.08);
+  }
+
+  .ctabs__node {
+    display: none;
+  }
+
+  .ctabs__role {
+    font-size: 1.05rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctabs__pane--in {
+    animation: none;
+  }
+}
+
+/* ===========================================================================
+   TOOLKIT — mechanical keyboard
+   ---------------------------------------------------------------------------
+   See components/site/StackKeyboard.jsx. A 65% board seen from above: cream
+   case, cream caps with a lip of front face showing beneath each, dark
+   modifiers, coloured arrow accents, and an LED matrix strip across the top.
+   Your tools fill the alpha positions; the modifiers give it a keyboard's
+   silhouette. Press travel is a few pixels straight down.
+   =========================================================================== */
+
+.kb {
+  --u: 3.55rem; /* one key unit */
+  --gap: 6px;
+  --lip: 6px; /* visible front face under each cap */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Screen-reader-only text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Case ---------------------------------------------------------------- */
+
+/* Sized to its widest row, not stretched to the section: a keyboard is as
+   wide as its keys. The flexible modifiers then absorb only the small
+   differences between rows, not a whole missing column. */
+.kb__case {
+  width: fit-content;
+  max-width: 100%;
+  padding: 1rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(180deg, #ece4d3, #d9cfb9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -3px 0 #b9ac91,
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    0 2px 0 #a6997e;
+}
+
+/* The LED display's inset bezel. */
+.kb__bezel {
+  position: relative;
+  height: 100px;
+  margin-bottom: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 0.55rem;
+  background: #120c12;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.kb__led {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Plate --------------------------------------------------------------- */
+
+.kb__plate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 0.3rem;
+  border-radius: 0.6rem;
+  background: #cbbfa6;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.28);
+}
+
+.kb__row {
+  display: flex;
+  gap: var(--gap);
+}
+
+/* --- Keycap -------------------------------------------------------------- */
+
+/* Colourways. The default is the cream alpha; modifiers and accents override. */
+.key {
+  --cap: #f3ecdb;
+  --cap-hi: #faf5e8;
+  --cap-lo: #e6dcc4;
+  --front: #b8ab8f;
+  --legend: #2a1c22;
+  --sub: #eb4400;
+
+  position: relative;
+  flex: none;
+  width: calc(var(--u) * var(--w, 1));
+  height: var(--u);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A flexible modifier absorbs whatever width its row has left, so every row
+   ends flush on the same edge whatever its keys add up to. */
+.key--flex {
+  flex: 1 1 calc(var(--u) * var(--w, 1));
+  width: auto;
+}
+
+.key--mod {
+  cursor: default;
+}
+
+.key--dark {
+  --cap: #2c2330;
+  --cap-hi: #3a2f3e;
+  --cap-lo: #221a26;
+  --front: #120c15;
+  --legend: #e9dfcb;
+}
+
+.key--blue {
+  --cap: #3f8ff0;
+  --cap-hi: #62a5f5;
+  --cap-lo: #2f78d2;
+  --front: #1d4f8f;
+  --legend: #ffffff;
+}
+
+.key--green {
+  --cap: #2fb886;
+  --cap-hi: #4fcb9e;
+  --cap-lo: #259a70;
+  --front: #16634a;
+  --legend: #ffffff;
+}
+
+.key--yellow {
+  --cap: #f2c02e;
+  --cap-hi: #f8d35c;
+  --cap-lo: #d9a91f;
+  --front: #9a7612;
+  --legend: #2a1c22;
+}
+
+.key--red {
+  --cap: #e34a3c;
+  --cap-hi: #ec6b5f;
+  --cap-lo: #c73b2e;
+  --front: #862419;
+  --legend: #ffffff;
+}
+
+/* The cap: a slightly dished top, and beneath it the lip of the front face,
+   drawn with a hard shadow. Pressing drops the cap onto the plate and the lip
+   collapses with it. */
+.key__cap {
+  position: absolute;
+  inset: 0 0 var(--lip) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--cap-hi), var(--cap) 55%, var(--cap-lo));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 1px 0 0 rgba(255, 255, 255, 0.18),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1),
+    0 var(--lip) 0 var(--front),
+    0 calc(var(--lip) + 1px) 0 rgba(0, 0, 0, 0.35),
+    0 calc(var(--lip) + 5px) 8px rgba(0, 0, 0, 0.28);
+  transition:
+    transform 70ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 70ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    filter 160ms var(--ease);
+}
+
+.key__logo {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  fill: var(--legend);
+}
+
+.key__legend {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--legend);
+  text-align: center;
+  line-height: 1.1;
+  padding-inline: 0.15rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* Modifier legends sit low-left like the reference, in a lighter weight. */
+.key__legend--mod {
+  position: absolute;
+  left: 0.45rem;
+  bottom: 0.4rem;
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0.85;
+}
+
+.key__sub {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.48rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--sub);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .key:not(.key--mod):hover .key__cap,
+  .key--space:hover .key__cap {
+    filter: brightness(1.05);
+  }
+}
+
+/* Pressed: straight down onto the plate. */
+.key--down .key__cap,
+.key:not(.key--mod):active .key__cap,
+.key--space:active .key__cap {
+  transform: translateY(calc(var(--lip) - 1px));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 1px 0 var(--front),
+    0 2px 3px rgba(0, 0, 0, 0.3);
+  filter: brightness(0.94);
+}
+
+.key:focus-visible .key__cap {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.kb__hint {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* --- Narrow screens ------------------------------------------------------ */
+
+/* A 65% board is 16 units wide; on a phone the units shrink and the case is
+   allowed to scroll sideways rather than the rows being broken, because a
+   keyboard whose rows wrap is no longer a keyboard. */
+@media (max-width: 899px) {
+  .kb {
+    --u: 2.4rem;
+    --gap: 4px;
+    --lip: 4px;
+    align-items: stretch;
+  }
+
+  .kb__case {
+    max-width: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .kb__case::-webkit-scrollbar {
+    display: none;
+  }
+
+  .kb__bezel {
+    height: 72px;
+    min-width: 40rem;
+  }
+
+  .kb__plate {
+    min-width: 40rem;
+  }
+
+  .key__legend {
+    font-size: 0.44rem;
+  }
+
+  .key__logo {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key__cap {
+    transition: none;
+  }
+}
+
+/* ===========================================================================
+   PORTRAIT
+   =========================================================================== */
+
+.portrait {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #050505;
+}
+
+.portrait__img {
+  object-fit: cover;
+  object-position: 64% 42%;
+  transform: scale(1.02);
+  filter: sepia(0.42) contrast(1.12) saturate(0.9) brightness(1.02);
+  transition:
+    transform 1.4s var(--ease),
+    filter 900ms ease;
+}
+
+.portrait:hover .portrait__img {
+  transform: scale(1.07);
+  filter: sepia(0) contrast(1.04) saturate(1) brightness(1);
+}
+
+.portrait__levels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(18, 10, 20, 0.92) 0%,
+    rgba(18, 10, 20, 0.28) 30%,
+    transparent 60%
+  );
+}
+
+.portrait__caption {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(242, 230, 189, 0.7);
+}
+
+/* ===========================================================================
+   BUTTONS + LINKS
+   =========================================================================== */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 9999px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+  transition: color 400ms var(--ease), border-color 400ms var(--ease);
+}
+
+/* Fill wipes up from the bottom edge on hover rather than cross-fading, which
+   reads as a deliberate action instead of a colour change. */
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--accent);
+  transform: translateY(101%);
+  transition: transform 500ms var(--ease);
+}
+
+.btn:hover {
+  color: #120a14;
+  border-color: var(--accent);
+}
+
+.btn:hover::before {
+  transform: translateY(0);
+}
+
+.btn--solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #120a14;
+}
+
+.btn--solid::before {
+  background: var(--ink);
+}
+
+.btn--solid:hover {
+  color: #120a14;
+  border-color: var(--ink);
+}
+
+/* Underline that draws from the left on hover. */
+.link-u {
+  position: relative;
+  color: var(--ink);
+  transition: color 300ms var(--ease);
+}
+
+.link-u::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform 450ms var(--ease);
+}
+
+.link-u:hover {
+  color: var(--gold);
+}
+
+.link-u:hover::after {
+  transform: scaleX(1);
+  transform-origin: 0 50%;
+}
+
+/* ===========================================================================
+   CONTACT + FOOTER
+   =========================================================================== */
+
+.contact__huge {
+  display: inline-block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(3rem, 13vw, 11rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition: color 500ms var(--ease), letter-spacing 700ms var(--ease);
+}
+
+.contact__huge:hover {
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.footer {
+  border-top: 1px solid var(--line);
+  padding-block: 2.5rem 3rem;
+}
+
+.footer__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.footer__socials {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* ===========================================================================
+   SCROLL PROGRESS
+   =========================================================================== */
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 95;
+  height: 2px;
+  pointer-events: none;
+  background: rgba(242, 230, 189, 0.06);
+}
+
+.progress__bar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+/* ===========================================================================
+   REVEALS
+   =========================================================================== */
 
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(30px);
   transition:
-    opacity 700ms ease,
-    transform 700ms cubic-bezier(0.2, 0.7, 0.3, 1);
+    opacity 900ms var(--ease),
+    transform 900ms var(--ease);
 }
 
 .reveal.is-revealed {
@@ -157,268 +2535,12 @@
   transform: none;
 }
 
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 60;
-  height: 2px;
-  pointer-events: none;
-  background-color: rgba(34, 211, 238, 0.08);
-}
-
-.scroll-progress__bar {
-  display: block;
-  height: 100%;
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  opacity: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 255, 65, 0.65),
-    #00ff41 45%,
-    #22d3ee 100%
-  );
-  box-shadow:
-    0 0 8px rgba(34, 211, 238, 0.85),
-    0 0 18px rgba(0, 255, 65, 0.45);
-  transition: opacity 200ms ease;
-  will-change: transform;
-}
-
-/* --- 7. Nav condensing on scroll ---------------------------------------- */
-
-.site-nav__shell {
-  transition:
-    padding 300ms ease,
-    background-color 300ms ease,
-    border-color 300ms ease,
-    box-shadow 300ms ease,
-    backdrop-filter 300ms ease;
-}
-
-.site-nav--condensed .site-nav__shell {
-  background-color: rgba(18, 8, 31, 0.92);
-  border-color: rgba(192, 132, 252, 0.55);
-  box-shadow:
-    0 8px 30px -12px rgba(0, 0, 0, 0.9),
-    0 0 18px -6px rgba(192, 132, 252, 0.35);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  backdrop-filter: blur(20px) saturate(140%);
-}
-
-/* The crystal glow on the active/hovered item, matching the shard colour that
-   the canvas behind these links paints. */
-.site-nav__link:hover,
-.site-nav__link:focus-visible {
-  text-shadow:
-    0 0 5px #c084fc,
-    0 0 10px #c084fc;
-}
-
-/* --- 8. Per-platform social glows --------------------------------------- */
-
-.social-link {
-  transition:
-    color 200ms ease,
-    transform 200ms ease,
-    filter 250ms ease;
-}
-
-.social-link--github:hover {
-  color: #ffffff;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-}
-
-.social-link--linkedin:hover {
-  color: #38bdf8;
-  filter: drop-shadow(0 0 9px rgba(56, 189, 248, 0.9));
-}
-
-.social-link--mail:hover {
-  color: #2dd4bf;
-  filter: drop-shadow(0 0 9px rgba(45, 212, 191, 0.9));
-}
-
-/* --- 9. Live status badge ----------------------------------------------- */
-
-/* Pulses the border and halo instead of whole-element opacity, so the ONLINE
-   label stays legible throughout. */
-.status-live {
-  animation: status-pulse 2.4s ease-in-out infinite;
-}
-
-@keyframes status-pulse {
-  0%,
-  100% {
-    border-color: rgba(34, 197, 94, 0.7);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3);
-  }
-  50% {
-    border-color: rgba(34, 197, 94, 1);
-    box-shadow: 0 0 14px 3px rgba(34, 197, 94, 0.3);
-  }
-}
-
-/* --- Motion and touch fallbacks ----------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .typing-caret,
-  .profile-radar,
-  .status-live {
-    animation: none;
-  }
-
-  .magnetic {
-    transform: none !important;
-    transition: none;
-  }
-
-  .magnetic__ripple {
-    display: none;
-  }
-
-
-}
-
-/* ===========================================================================
-   Cinematic scroll layer
-   ---------------------------------------------------------------------------
-   Section dots, staggered reveals, project banner reveal.
-   Transform/opacity only. Palette unchanged: #00ff41, #22d3ee, black ground.
-   =========================================================================== */
-
-
-/* The hero's own entrance is driven by its existing Tailwind transition
-   classes, released on mount. */
-/* --- 2. Section dot navigation ------------------------------------------ */
-/* --- Section dot navigation ---------------------------------------------- */
-.section-dots {
-  position: fixed;
-  top: 50%;
-  right: 1.25rem;
-  z-index: 55;
-  transform: translateY(-50%);
-}
-
-.section-dots__list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.section-dots__item {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.section-dots__dot {
-  position: relative;
-  display: block;
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: 1px solid rgba(34, 211, 238, 0.5);
-  border-radius: 9999px;
-  background-color: transparent;
-  transition:
-    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 260ms ease,
-    border-color 260ms ease,
-    box-shadow 260ms ease;
-}
-
-.section-dots__dot:hover,
-.section-dots__dot:focus-visible {
-  border-color: #00ff41;
-  transform: scale(1.35);
-}
-
-.section-dots__dot--active {
-  background-color: #00ff41;
-  border-color: #00ff41;
-  transform: scale(1.55);
-  box-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
-}
-
-/* Label sits to the left of its dot and only appears on hover/focus. */
-.section-dots__label {
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 0.75rem);
-  transform: translate3d(6px, -50%, 0);
-  padding: 0.2rem 0.5rem;
-  border: 1px solid rgba(34, 211, 238, 0.3);
-  border-radius: 0.25rem;
-  background-color: rgba(3, 7, 18, 0.92);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: #22d3ee;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 220ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.section-dots__dot:hover .section-dots__label,
-.section-dots__dot:focus-visible .section-dots__label {
-  opacity: 1;
-  transform: translate3d(0, -50%, 0);
-}
-
-/* Tightened on tablets; the labels have no hover to reveal them on touch. */
-@media (max-width: 1023px) {
-  .section-dots {
-    right: 0.75rem;
-  }
-
-  .section-dots__list {
-    gap: 0.8rem;
-  }
-
-  .section-dots__dot {
-    width: 7px;
-    height: 7px;
-  }
-
-  .section-dots__label {
-    display: none;
-  }
-}
-
-/* Dropped on phones: at 375px the dots land within a few pixels of the text
-   edge, and the top nav already provides section navigation. */
-@media (max-width: 640px) {
-  .section-dots {
-    display: none;
-  }
-}
-
-/* --- 4. Staggered section reveals --------------------------------------- */
-
-/* The wrapper holds still and its direct children cascade. Delays are
-   nth-child rules so no JS has to touch individual children. */
 .reveal-stagger > * {
   opacity: 0;
   transform: translateY(26px);
   transition:
-    opacity 620ms ease,
-    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
+    opacity 800ms var(--ease),
+    transform 800ms var(--ease);
 }
 
 .reveal-stagger.is-revealed > * {
@@ -426,513 +2548,72 @@
   transform: none;
 }
 
-.reveal-stagger > *:nth-child(1) {
-  transition-delay: 0ms;
-}
-.reveal-stagger > *:nth-child(2) {
-  transition-delay: 80ms;
-}
-.reveal-stagger > *:nth-child(3) {
-  transition-delay: 160ms;
-}
-.reveal-stagger > *:nth-child(4) {
-  transition-delay: 240ms;
-}
-.reveal-stagger > *:nth-child(5) {
-  transition-delay: 320ms;
-}
-.reveal-stagger > *:nth-child(6) {
-  transition-delay: 400ms;
-}
-.reveal-stagger > *:nth-child(7) {
-  transition-delay: 480ms;
-}
-.reveal-stagger > *:nth-child(8) {
-  transition-delay: 560ms;
-}
+.reveal-stagger > *:nth-child(1) { transition-delay: 0ms; }
+.reveal-stagger > *:nth-child(2) { transition-delay: 90ms; }
+.reveal-stagger > *:nth-child(3) { transition-delay: 180ms; }
+.reveal-stagger > *:nth-child(4) { transition-delay: 270ms; }
+.reveal-stagger > *:nth-child(5) { transition-delay: 360ms; }
+.reveal-stagger > *:nth-child(6) { transition-delay: 450ms; }
+.reveal-stagger > *:nth-child(7) { transition-delay: 540ms; }
+.reveal-stagger > *:nth-child(8) { transition-delay: 630ms; }
 
-/* --- 3. Project preview reveal ----------------------------------------- */
-
-/* One banner geometry for every card, so a new screenshot needs no per-card
-   fixes: fixed aspect ratio, cover-cropped, biased to the top, and inset from
-   the card's rounded corners so image content is never flush to the edge. */
-.project-card__media {
-  cursor: pointer;
-  aspect-ratio: 9 / 4;
-  height: auto;
-  padding: 0.5rem;
-}
-
-/* Screenshot banner. Sits under the icon badge and the slide-up overlay. */
-.project-card__banner {
-  position: absolute;
-  /* Matches .project-card__media padding, giving the image breathing room. */
-  inset: 0.5rem;
-  overflow: hidden;
-  border-radius: 0.25rem;
-}
-
-.project-card__banner-media {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Top-biased default: headers and titles are what identify a screenshot.
-     Individual projects can override via the previewPosition field. */
-  object-position: center top;
-  transform: scale(1);
-  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Fades the image into the card body so the banner has no hard bottom edge. */
-.project-card__banner-fade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(3, 7, 18, 0.96) 0%,
-    rgba(3, 7, 18, 0.6) 10%,
-    transparent 30%
-  );
-}
-
-.project-card__overlay {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 0.7rem;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.92),
-    rgba(0, 0, 0, 0.55) 65%,
-    transparent
-  );
-  transform: translateY(101%);
-  opacity: 0;
-  transition:
-    transform 380ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 300ms ease;
-}
-
-.project-card__overlay-tech {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.project-card__chip {
-  padding: 0.1rem 0.4rem;
-  border: 1px solid rgba(34, 211, 238, 0.35);
-  border-radius: 9999px;
-  background-color: rgba(3, 7, 18, 0.7);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.6rem;
-  color: #22d3ee;
-  white-space: nowrap;
-}
-
-.project-card__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex: none;
-  padding: 0.3rem 0.55rem;
-  border-radius: 0.375rem;
-  background-color: #00ff41;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: #000000;
-  transition: filter 200ms ease;
-}
-
-.project-card__cta:hover {
-  filter: brightness(1.15);
-}
-
-/* Fade the placeholder glyph out as the real preview comes in. */
-/* Badge keeps its drop-shadow above the banner at all times. */
-.project-card__glyph {
-  z-index: 2;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.75));
-}
-
-/* Touch: driven by the data attribute this component toggles. */
-.project-card[data-open="true"] .project-card__overlay {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.project-card[data-open="true"] .project-card__banner-media {
-  transform: scale(1.05);
-}
-
-/* Pointer devices only, so touch never inherits sticky hover states. */
-@media (hover: hover) and (pointer: fine) {
-  .project-card:hover .project-card__banner-media {
-    transform: scale(1.05);
-  }
-
-  .project-card:hover .project-card__overlay {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* --- Reduced motion ----------------------------------------------------- */
+/* ===========================================================================
+   REDUCED MOTION
+   ---------------------------------------------------------------------------
+   Everything decorative stops; everything structural resolves to its final
+   state so no content is left hidden behind an animation that never runs.
+   =========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
+  .grain,
+  .painting__img {
+    animation: none;
+  }
+
+  .mask-line > span,
+  .reveal,
   .reveal-stagger > * {
     opacity: 1;
     transform: none;
     transition: none;
   }
 
-
-  .project-card__overlay,
-  .project-card__banner-media {
+  .rule {
+    transform: scaleX(1);
     transition: none;
   }
 
-  .section-dots__dot,
-  .section-dots__label {
-    transition: none;
-  }
-}
-
-/* ===========================================================================
-   Hero portrait (components/HeroPortrait.jsx)
-   ---------------------------------------------------------------------------
-   Minimal editorial treatment: duotone portrait, no rotation, no frame chrome.
-   Strictly grayscale - the green/cyan accent stays reserved for links and
-   buttons, so the photo and its accents carry contrast instead of colour.
-   =========================================================================== */
-
-.portrait {
-  /* Focal point held fixed while zooming, and the zoom that pulls a chest-up
-     crop out of a wider shot. Nudge these two to reframe. */
-  --portrait-focus: 64% 56%;
-  --portrait-zoom: 2.05;
-
-  position: relative;
-  width: clamp(15rem, 62vw, 26rem);
-  /* Negative space around the portrait rather than decoration up against it. */
-  margin: 0 auto;
-  padding: 2.5rem 2rem;
-}
-
-.portrait__frame {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  background-color: #050505;
-}
-
-.portrait__img {
-  object-fit: cover;
-  object-position: var(--portrait-focus);
-  transform: scale(var(--portrait-zoom));
-  transform-origin: var(--portrait-focus);
-  /* Full desaturation, then crushed blacks and lifted off-white highlights. */
-  filter: grayscale(1) contrast(1.32) brightness(1.04);
-}
-
-/* Deepens the shadows further and dissolves the bottom edge into the page, so
-   the crop ends in negative space rather than on a hard line. */
-.portrait__levels {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.55) 14%, transparent 42%),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 30%);
-}
-
-/* --- Geometric accents --------------------------------------------------- */
-
-.portrait__sq {
-  position: absolute;
-  pointer-events: none;
-}
-
-/* Hollow outlines */
-.portrait__sq--a,
-.portrait__sq--c,
-.portrait__sq--e {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-/* Solid muted-gray fills */
-.portrait__sq--b,
-.portrait__sq--d,
-.portrait__sq--f {
-  background-color: rgba(148, 163, 184, 0.16);
-}
-
-/* Placed along the edges and clear of the centre, where the face sits. */
-.portrait__sq--a {
-  top: 0.5rem;
-  left: 0.25rem;
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.portrait__sq--b {
-  top: 2.75rem;
-  left: 1.4rem;
-  width: 0.5rem;
-  height: 0.5rem;
-}
-
-.portrait__sq--c {
-  top: 1.25rem;
-  right: 0.4rem;
-  width: 0.85rem;
-  height: 0.85rem;
-}
-
-.portrait__sq--d {
-  bottom: 3.25rem;
-  right: 0.3rem;
-  width: 1.15rem;
-  height: 1.15rem;
-}
-
-.portrait__sq--e {
-  bottom: 0.75rem;
-  right: 2.1rem;
-  width: 2.25rem;
-  height: 2.25rem;
-}
-
-.portrait__sq--f {
-  bottom: 1.5rem;
-  left: 0.6rem;
-  width: 0.7rem;
-  height: 0.7rem;
-}
-
-/* --- Responsive --------------------------------------------------------- */
-
-/* Below the hero's two-column breakpoint the portrait stacks under the copy,
-   centred, with the accents scaled down so they stay subtle. */
-@media (max-width: 1023px) {
-  .portrait {
-    width: clamp(13rem, 74vw, 20rem);
-    margin-top: 1.5rem;
-    padding: 1.75rem 1.5rem;
+  .statement__word {
+    color: var(--ink);
   }
 
-  .portrait__sq--a {
-    width: 1.25rem;
-    height: 1.25rem;
+  .deck {
+    height: auto;
   }
 
-  .portrait__sq--e {
-    width: 1.5rem;
-    height: 1.5rem;
+  .deck__stage {
+    position: static;
+    height: auto;
+    padding-inline: 0;
+    overflow: visible;
   }
 
-  .portrait__sq--d {
-    width: 0.85rem;
-    height: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .portrait {
-    width: min(17rem, 82vw);
-    padding: 1.25rem 1.1rem;
+  .deck__frame {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: auto;
   }
 
-  .portrait__sq--b,
-  .portrait__sq--f {
-    width: 0.4rem;
-    height: 0.4rem;
+  .deck__card {
+    position: relative;
+    inset: auto;
+    opacity: 1;
+    transform: none;
   }
 
-  .portrait__sq--c {
-    width: 0.6rem;
-    height: 0.6rem;
+  .deck__tint {
+    display: none;
   }
-}
 
-/* ===========================================================================
-   Experience & Education — terminal "git log"
-   ---------------------------------------------------------------------------
-   A faux terminal window whose body is a commit history: a vertical graph rail
-   with commit nodes, a short SHA, a coloured ref tag, and the entry body. Fits
-   the site's mono/hacker aesthetic instead of a generic two-column card grid.
-   =========================================================================== */
-
-.career-term {
-  max-width: 46rem;
-  margin: 0 auto;
-  border: 1px solid rgba(34, 211, 238, 0.2);
-  border-radius: 0.85rem;
-  background: linear-gradient(
-    180deg,
-    rgba(8, 12, 24, 0.92),
-    rgba(3, 7, 18, 0.94)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  overflow: hidden;
-  box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-/* Window chrome */
-.career-term__bar {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.7rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-}
-.career-term__dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 9999px;
-}
-.career-term__dot--red {
-  background: #ff5f57;
-}
-.career-term__dot--amber {
-  background: #febc2e;
-}
-.career-term__dot--green {
-  background: #28c840;
-}
-.career-term__file {
-  margin-left: 0.65rem;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.72rem;
-  color: #64748b;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Commit history */
-.career-log {
-  list-style: none;
-  margin: 0;
-  padding: 1.4rem 1.4rem 1.6rem;
-  position: relative;
-}
-.career-log__entry {
-  position: relative;
-  padding-left: 1.75rem;
-}
-.career-log__entry + .career-log__entry {
-  margin-top: 1.75rem;
-}
-
-/* Graph rail: each entry draws the segment down to the next node. */
-.career-log__entry::before {
-  content: "";
-  position: absolute;
-  left: 5px;
-  top: 0.55rem;
-  bottom: -1.75rem;
-  width: 2px;
-  background: linear-gradient(
-    to bottom,
-    rgba(34, 211, 238, 0.5),
-    rgba(34, 211, 238, 0.15)
-  );
-}
-.career-log__entry:last-child::before {
-  display: none;
-}
-
-.career-log__node {
-  position: absolute;
-  left: 0;
-  top: 0.3rem;
-  width: 12px;
-  height: 12px;
-  border-radius: 9999px;
-  background: #030712;
-  border: 2px solid #22d3ee;
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
-}
-
-.career-log__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
-.career-log__hash {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.72rem;
-  color: #eab308;
-  letter-spacing: 0.02em;
-}
-.career-log__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  padding: 0.08rem 0.5rem;
-  border-radius: 9999px;
-  border: 1px solid;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.66rem;
-}
-.career-log__tag--edu {
-  color: #22d3ee;
-  border-color: rgba(34, 211, 238, 0.4);
-  background: rgba(34, 211, 238, 0.08);
-}
-.career-log__tag--work {
-  color: #c084fc;
-  border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(168, 85, 247, 0.08);
-}
-.career-log__tag--security {
-  color: #4ade80;
-  border-color: rgba(74, 222, 128, 0.4);
-  background: rgba(74, 222, 128, 0.08);
-}
-.career-log__date {
-  margin-left: auto;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.7rem;
-  color: #64748b;
-}
-.career-log__title {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1.35;
-  color: #ffffff;
-  margin-bottom: 0.2rem;
-}
-.career-log__org {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.78rem;
-  color: #22d3ee;
-  margin-bottom: 0.45rem;
-}
-.career-log__desc {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.76rem;
-  line-height: 1.6;
-  color: #94a3b8;
-}
-
-@media (max-width: 640px) {
-  .career-log__date {
-    margin-left: 0;
-    width: 100%;
-  }
 }

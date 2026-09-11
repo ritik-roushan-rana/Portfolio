@@ -1,569 +1,614 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
-  Shield,
-  Terminal,
+  ArrowUpRight,
   Cpu,
+  Database,
+  Download,
   Eye,
-  Bug,
+  FileSearch,
+  Factory,
+  Fingerprint,
   Github,
   Linkedin,
+  LineChart,
+  Siren,
   Mail,
-  Download,
+  Shield,
+  Ticket,
   Zap,
-  Server,
-  Database,
-  MapPin,
-  Phone,
 } from "lucide-react";
-import Button from "./ui/Button";
-import Badge from "./ui/Badge";
-import TypingEffect from "./TypingEffect";
-import MagneticButton from "./interactive/MagneticButton";
-import Reveal from "./interactive/Reveal";
-import useScrolled from "./interactive/useScrolled";
-import HeroPortrait from "./HeroPortrait";
-import ProjectCard from "./interactive/ProjectCard";
-import SectionDots from "./interactive/SectionDots";
-import { ParallaxComponent } from "./ui/parallax-scrolling";
+
+import Painting from "./site/Painting";
+import TopBar from "./site/TopBar";
+import Compass from "./site/Compass";
+import MaskText from "./site/MaskText";
+import Statement from "./site/Statement";
+import ProjectDeck from "./site/ProjectDeck";
+import CareerTabs from "./site/CareerTabs";
+import StackKeyboard from "./site/StackKeyboard";
+import Reveal from "./site/Reveal";
 import { scrollToSection } from "@/lib/smooth-scroll";
 
+const SECTIONS = [
+  { id: "home", label: "Index" },
+  { id: "about", label: "About" },
+  { id: "work", label: "Work" },
+  { id: "path", label: "Path" },
+  { id: "toolkit", label: "Toolkit" },
+  { id: "contact", label: "Contact" },
+];
+
+/** The four the deck deals through. */
+const PROJECTS = [
+  {
+    title: "Optifolio",
+    meta: "Fintech · Reinforcement learning · Solo build",
+    summary:
+      "A Deep Q-Learning portfolio rebalancer that learns its policy from historical market data, wrapped in a Flutter app for goal setting, backtesting and rebalancing suggestions.",
+    stats: [
+      { label: "Domain", value: "Fintech" },
+      { label: "Core", value: "Deep Q-Learning" },
+      { label: "Surface", value: "Flutter iOS" },
+    ],
+    tech: ["PyTorch", "Flutter", "Express.js", "MongoDB", "Plotly"],
+    icon: Zap,
+    // Swipeable screens, ordered as a walkthrough: portfolio, what is in it,
+    // then the reinforcement-learning rebalancer that is the point of the
+    // project — early enough that a reader who swipes twice still reaches it.
+    // Any that fail to load are dropped individually; see DeckArt.
+    shots: [
+      { src: "/projects/optifolio/overview.png", label: "Overview" },
+      { src: "/projects/optifolio/holdings.png", label: "Holdings" },
+      { src: "/projects/optifolio/rebalance.png", label: "RL rebalance" },
+      { src: "/projects/optifolio/stock.png", label: "Stock detail" },
+      { src: "/projects/optifolio/analytics.png", label: "Analytics" },
+      { src: "/projects/optifolio/news.png", label: "News & alerts" },
+      { src: "/projects/optifolio/assistant.png", label: "AI assistant" },
+    ],
+    wash: "linear-gradient(135deg, #ffc46b, #eb4400)",
+    github: "https://github.com/ritik-roushan-rana/OptiFolio",
+    demo: "https://drive.google.com/file/d/1_B-TvkwtawxcEpd7G_eS0meuNbnXG_NH/view?usp=drivesdk",
+  },
+  {
+    title: "MarketMind",
+    meta: "Fintech · Explainable ML · Solo build",
+    summary:
+      "Next-day directional prediction for 15 large-cap equities. XGBoost over price and sentiment features, FinBERT scoring the day's headlines, and per-feature TreeSHAP attributions behind every call — with a plain-English rationale written only from those attributions, so it cannot invent a story the model did not tell.",
+    stats: [
+      { label: "Domain", value: "Fintech" },
+      { label: "Core", value: "XGBoost + FinBERT" },
+      { label: "Surface", value: "FastAPI + React" },
+    ],
+    tech: ["XGBoost", "FinBERT", "SHAP", "FastAPI", "React", "Gemini"],
+    icon: LineChart,
+    // A desktop dashboard, so it gets a browser window rather than a phone.
+    frame: "browser",
+    shots: [
+      { src: "/projects/marketmind/dashboard.png", label: "Dashboard" },
+    ],
+    wash: "linear-gradient(135deg, #ffd27a, #c2452a)",
+    github: "https://github.com/ritik-roushan-rana/MarketMind",
+    demo: "https://market2-ivory.vercel.app/",
+  },
+  {
+    title: "VTour",
+    meta: "Campus · Mobile product · UI/UX + build",
+    summary:
+      "A virtual campus tour for new students — maps, departments and facilities in one Flutter app, designed around a single uninterrupted navigation flow.",
+    stats: [
+      { label: "Domain", value: "EdTech" },
+      { label: "Core", value: "Guided tours" },
+      { label: "Surface", value: "Flutter iOS" },
+    ],
+    tech: ["Flutter", "Supabase", "UI/UX", "iOS"],
+    icon: Eye,
+    // The product itself, in the order you move through it. Onboarding and the
+    // sign-in form are deliberately absent: they show the app's plumbing rather
+    // than what it does.
+    shots: [
+      { src: "/projects/vtour/home.png", label: "Campus guide" },
+      { src: "/projects/vtour/tour.png", label: "Guided tour" },
+      { src: "/projects/vtour/map.png", label: "Campus map" },
+      { src: "/projects/vtour/location.png", label: "Location" },
+    ],
+    wash: "linear-gradient(135deg, #ff9d5c, #93334f)",
+    github: "https://github.com/ritik-roushan-rana/VTOUR",
+    demo: "https://drive.google.com/file/d/1QyKJeWc1yVEDrFa4WhFBdcjEeyPYIWkX/view?usp=drivesdk",
+  },
+  {
+    title: "SCBF",
+    meta: "Security · Temporal graph networks · Patent pending",
+    summary:
+      "Supply Chain Behavioral Fingerprinting: eBPF captures what a package actually does while it installs — syscalls, file writes, network connections, credential reads — a Temporal Graph Network encodes that into a behavioural fingerprint, and it is scored against a learned envelope of what legitimate packages of that type do. Matches the OSCAR benchmark's F1 at roughly 30x lower per-package latency.",
+    // Published numbers from the repo's own evaluation on the OSCAR benchmark
+    // (Zenodo 13746167), test split at the tuned 0.35 threshold.
+    stats: [
+      { label: "Test F1", value: "92.3%" },
+      { label: "ROC-AUC", value: "0.979" },
+      { label: "Per package", value: "~3s" },
+    ],
+    tech: ["PyTorch", "TGN", "eBPF", "Graph ML", "Python"],
+    icon: Fingerprint,
+    wash: "linear-gradient(135deg, #eb4400, #5b2550)",
+    github: "https://github.com/ritik-roushan-rana/SCBF",
+    // No public deployment: it needs a Linux host with eBPF running as root.
+    demo: null,
+  },
+];
+
+/**
+ * Shown only in the "See all" panel. The deck reserves a full viewport of
+ * scroll per card, so it stays a curated four; this is the rest of the shelf.
+ */
+const MORE_PROJECTS = [
+  {
+    title: "TixLock",
+    meta: "Ticketing · Full stack · Solo build",
+    summary:
+      "A ticket booking platform where the hard part is concurrency: seats lock in real time while a customer checks out, holds expire on their own, and a waitlist reassigns a seat the moment one is released. QR-code tickets, email notifications, and separate roles for customers, organisers and admins.",
+    stats: [
+      { label: "Domain", value: "Ticketing" },
+      { label: "Core", value: "Real-time seat locks" },
+      { label: "Surface", value: "React + Postgres" },
+    ],
+    tech: ["React", "Node.js", "Express", "PostgreSQL"],
+    icon: Ticket,
+    // Desktop captures, so they get the browser frame rather than a phone.
+    frame: "browser",
+    // Seat map first: it is the screen that shows what the project is actually
+    // about — the locking, holds and waitlist states are all legible in it.
+    shots: [
+      { src: "/projects/tix/seatmap.png", label: "Seat map" },
+      { src: "/projects/tix/events.png", label: "Events" },
+    ],
+    wash: "linear-gradient(135deg, #ffc46b, #a8402f)",
+    github: "https://github.com/ritik-roushan-rana/tixlock",
+    demo: "https://tixlock-seven.vercel.app",
+  },
+  {
+    title: "Grade Change Intelligence",
+    meta: "Industrial ML · Quality control · Solo build",
+    summary:
+      "An assistant for a paper mill's quality control system. It watches a grade change in progress, flags rising risk of breaching the 2.5% basis-weight deviation limit before it happens, and recommends corrective setpoints drawn from a library of similar historical recoveries — with the reasoning behind each suggestion. Every model stays in Python behind a REST API; the browser only draws what it returns.",
+    stats: [
+      { label: "Recoveries", value: "344 patterns" },
+      { label: "Core", value: "RF + GBM + KNN" },
+      { label: "Cold start", value: "0.3s" },
+    ],
+    tech: ["Python", "scikit-learn", "FastAPI", "React", "TypeScript"],
+    icon: Factory,
+    wash: "linear-gradient(135deg, #ffb765, #7a3350)",
+    github: "https://github.com/ritik-roushan-rana/grade-change-intelligence",
+    // The repo lists a Render URL, but it did not answer inside three minutes —
+    // free-tier instances spin down and this one looks suspended. Left unlinked
+    // rather than shipping a dead "View project" button.
+    demo: null,
+  },
+  {
+    title: "Fact Knowledge Layer",
+    meta: "Document AI · Deterministic core · Solo build",
+    summary:
+      "Pulls checkable claims out of PDFs, proves each one against the exact region of the exact page it came from, and decides whether claims in different documents corroborate, contradict, or only look like they conflict because they measure different things. No LLM reads a PDF or decides a relationship — the core is rules, and a strict mode refuses even the optional adjudication of ambiguous pairs.",
+    // Live figures from the app's own Documents view, over a five-document
+    // run. "None" is the project's whole thesis, so it keeps a cell.
+    stats: [
+      { label: "Grounded facts", value: "4,249" },
+      { label: "Relationships", value: "14,165" },
+      { label: "API keys", value: "None" },
+    ],
+    tech: ["Python", "PDF parsing", "Rule engine", "JavaScript"],
+    icon: FileSearch,
+    frame: "browser",
+    // Anchored left: the app's sidebar runs down the left edge, and a centred
+    // crop in a 16:10 tile cut half of it off.
+    focus: "left center",
+    shots: [{ src: "/projects/fact/documents.png", label: "Documents" }],
+    wash: "linear-gradient(135deg, #f0a862, #8c3350)",
+    github: "https://github.com/ritik-roushan-rana/fact-knowledge-layer",
+    // Runs locally against your own PDFs; there is no hosted instance.
+    demo: null,
+  },
+  {
+    title: "Emergency Vehicle AI",
+    meta: "Computer vision · Traffic control · Research",
+    summary:
+      "YOLOv8 and OpenCV pick ambulances, fire trucks and police vehicles out of a live traffic feed, then drive the signals: green is held or flipped from vehicle density and emergency presence across a two-lane, multi-junction Indian road, with a Google Maps route preview to the nearest destination.",
+    stats: [
+      { label: "Domain", value: "Traffic" },
+      { label: "Core", value: "YOLOv8 + OpenCV" },
+      { label: "Surface", value: "Python sim" },
+    ],
+    tech: ["YOLOv8", "OpenCV", "Python", "Google Maps API"],
+    icon: Siren,
+    frame: "browser",
+    shots: [
+      { src: "/projects/emergency/detection.png", label: "Live detection" },
+    ],
+    wash: "linear-gradient(135deg, #ff8a4d, #6d2a4a)",
+    github: "https://github.com/ritik-roushan-rana/Emergency_vehicle",
+    // Runs against a local video feed and a YOLO checkpoint; nothing to deploy.
+    demo: null,
+  },
+];
+
+/**
+ * Newest first. Each role's `points` are its own facts split into outcomes,
+ * each opening with a bold lead-in so the pane skims as a list before it
+ * reads as prose. Nothing here is new — it is the same content the paragraph
+ * version carried, re-cut. `location` is only set where it is actually known.
+ */
+const CAREER = [
+  {
+    kind: "Internship",
+    org: "Martvalley",
+    organization: "Martvalley Online Pvt. Ltd",
+    logo: "/logos/martvalley.png",
+    title: "Artificial Intelligence Intern",
+    years: "2025",
+    period: "May 2025 — Jul 2025",
+    icon: Cpu,
+    points: [
+      {
+        lead: "Shipped real-time AI modules",
+        text: "across 5+ development projects, cutting end-to-end processing latency by 30% and lifting system throughput by 25%.",
+      },
+      {
+        lead: "Took models to production:",
+        text: "optimised the ML training workflows and integrated the resulting models into live systems.",
+      },
+      {
+        lead: "Worked the image pipeline:",
+        text: "collaborated on pipelines handling 5,000+ images a week, raising model accuracy by 5%.",
+      },
+    ],
+  },
+  {
+    kind: "Internship",
+    org: "IBM",
+    organization: "IBM Career Education Program",
+    logo: "/logos/ibm.svg",
+    title: "Cyber Security Analyst Intern",
+    years: "2025",
+    period: "May 2025 — Jun 2025",
+    location: "Remote",
+    icon: Shield,
+    points: [
+      {
+        lead: "Analysed simulated threats",
+        text: "and applied defensive strategies to harden system environments.",
+      },
+      {
+        lead: "Monitored and reported vulnerabilities",
+        text: "across networks using industry-standard tooling.",
+      },
+      {
+        lead: "Built hands-on fundamentals",
+        text: "in malware analysis, threat intelligence and penetration testing.",
+      },
+    ],
+  },
+  {
+    kind: "Education",
+    org: "VIT Vellore",
+    organization: "Vellore Institute of Technology",
+    logo: "/logos/vit.png",
+    title: "B.Tech CSE, Information Security",
+    years: "2023 — 27",
+    period: "2023 — 2027",
+    location: "Vellore",
+    icon: Database,
+    points: [
+      {
+        lead: "Specialising in information security",
+        text: "within Computer Science and Engineering.",
+      },
+      {
+        lead: "Building alongside the degree:",
+        text: "self-directed work in software and mobile application development.",
+      },
+    ],
+  },
+];
+
+const TOOLKIT = [
+  {
+    name: "Languages",
+    items: [
+      "Python",
+      "Java",
+      "C++",
+      "TypeScript",
+      "Dart",
+      "SQL",
+    ],
+  },
+  {
+    name: "Frameworks",
+    items: [
+      "React",
+      "Next.js",
+      "Flutter",
+      "PyTorch",
+      "XGBoost",
+      "FastAPI",
+      "Stable-Baselines3",
+      "OpenCV",
+    ],
+  },
+  {
+    name: "Tooling",
+    items: [
+      "Git",
+      "Postman",
+      "Wireshark",
+      "ELK Stack",
+      "Docker",
+      "Matplotlib",
+      "Plotly",
+    ],
+  },
+  {
+    name: "Platforms",
+    items: ["Ubuntu", "Kali Linux", "VirtualBox", "Supabase", "Railway", "Vercel"],
+  },
+];
+
+const SOCIALS = [
+  {
+    label: "GitHub",
+    href: "https://github.com/ritik-roushan-rana?tab=repositories",
+    icon: Github,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/ritik-roushan-rana-b6a89528a/",
+    icon: Linkedin,
+  },
+  { label: "Email", href: "mailto:ritikrana8596@gmail.com", icon: Mail },
+];
+
+const RESUME_URL =
+  "https://drive.google.com/file/d/1vhBi2CfbaQDo-NzdqEiLRe8hky1TdnFA/view?usp=sharing";
 
 export default function Portfolio() {
-  const [expandedTech, setExpandedTech] = useState({});
-  const [expandedDesc, setExpandedDesc] = useState({});
-  const isScrolled = useScrolled(40);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const toggleTechExpansion = (projectIndex) => {
-    setExpandedTech(prev => ({
-      ...prev,
-      [projectIndex]: !prev[projectIndex]
-    }));
-  };
-
-  const toggleDescExpansion = (projectIndex) => {
-    setExpandedDesc(prev => ({
-      ...prev,
-      [projectIndex]: !prev[projectIndex]
-    }));
-  };
-
-  // Routed through the shared helper so the jump is handed to Lenis while it is
-  // driving the scroll. A native smooth scrollIntoView would fight it.
-  const handleNavClick = (sectionId) => {
-    scrollToSection(sectionId);
-  };
-
-  const skillGroups = [
-    {
-      category: "Programming Languages",
-      icon: Terminal,
-      skills: [
-        "Python",
-        "Java",
-        "C",
-        "C++",
-        "JavaScript",
-        "TypeScript",
-        "HTML",
-        "CSS",
-        "SQL",
-        "Dart"
-      ],
-      color: "from-blue-600 to-blue-400",
-    },
-    {
-      category: "Frameworks & Libraries",
-      icon: Server,
-      skills: [
-        "React.js",
-        "Next.js",
-        "Express.js",
-        "PyTorch",
-        "Stable-Baselines3",
-        "OpenCV",
-        "Flutter"
-      ],
-      color: "from-purple-600 to-purple-400",
-    },
-    {
-      category: "DevOps & Toolkits",
-      icon: Zap,
-      skills: [
-        "Git",
-        "Postman",
-        "Wireshark",
-        "ELK Stack",
-        "MongoDB",
-        "Matplotlib",
-        "Plotly"
-      ],
-      color: "from-green-600 to-green-400",
-    },
-    {
-      category: "Platforms & OS",
-      icon: Shield,
-      skills: [
-        "Ubuntu",
-        "Kali Linux",
-        "VirtualBox",
-        "Clerk Auth"
-      ],
-      color: "from-red-600 to-red-400",
-    },
-  ];
-
-  const projects = [
-    {
-      title: "Optifolio – AI Portfolio Rebalancing App",
-      description:
-        "Reinforcement Learning-driven portfolio rebalancer using Deep Q-Learning to optimize rebalancing policies from historical market data. Maximizes risk-adjusted returns while respecting user risk profiles and transaction costs. Features Flutter iOS app for goal setting, backtesting on ETFs/stocks, and actionable rebalancing suggestions with performance visualization.",
-      tech: ["Python", "PyTorch", "Stable-Baselines3", "Flutter", "Express.js", "MongoDB", "Yahoo Finance API", "Quandl", "Matplotlib", "Plotly"],
-      icon: Zap,
-      color: "from-yellow-500 to-orange-500",
-      github: "https://github.com/ritik-roushan-rana/OptiFolio",
-      demo: "https://drive.google.com/file/d/1_B-TvkwtawxcEpd7G_eS0meuNbnXG_NH/view?usp=drivesdk",
-    },
-    {
-      title: "VTour – Virtual Campus Tour App",
-      description:
-        "Built a mobile app to guide students through virtual campus tours using Flutter. Designed intuitive UI/UX for a smooth and interactive navigation experience. Provided students with easy access to campus maps, departments, and facility information.",
-      tech: ["Flutter", "Supabase", "UI/UX", "IOS Development"],
-      icon: Eye,
-      color: "from-blue-500 to-cyan-500",
-      github: "https://github.com/ritik-roushan-rana/VTOUR",
-      demo: "https://drive.google.com/file/d/1QyKJeWc1yVEDrFa4WhFBdcjEeyPYIWkX/view?usp=drivesdk",
-    },
-    {
-      title: "SSH Honeypot with ELK Stack",
-      description:
-        "Deployed Cowrie honeypot on Ubuntu to simulate an SSH server for logging unauthorised access attempts. Integrated with ELK Stack to visualise attacker logs and analyse malicious activity patterns. Developed understanding of network security, log analysis, and real-time threat monitoring.",
-      tech: ["Cybersecurity", "Cowrie", "Ubuntu", "ELK", "Virtual Machines"],
-      icon: Bug,
-      color: "from-red-500 to-pink-500",
-      // No public repo exists for this one on either account, so the VIEW CODE
-      // button is omitted rather than linking to a 404. Add the URL back here
-      // once the repository is published.
-      github: null,
-      demo: "https://youtu.be/6NElUW4gqSc",
-    },
-    {
-      title: "🎯 Organizo – Task Management Web App",
-      description:
-        "A modern Kanban-style task management platform designed for individuals and teams to organize, track, and manage tasks efficiently. Features secure authentication, board & task management, drag-and-drop functionality, full CRUD operations, team collaboration support, and fully responsive UI.",
-      tech: ["React", "Express.js", "MongoDB", "Clerk Auth"],
-      icon: Terminal,
-      color: "from-purple-500 to-violet-500",
-      github: "https://github.com/ritik-roushan-rana/web-project",
-      demo: "https://organizo-task-manager.netlify.app",
-    },
-  ];
-
-  // A single chronological log (newest first), rendered as a git-style commit
-  // history. `tag` drives the chip colour; `hash` is decorative, mimicking a
-  // short commit SHA to sell the terminal metaphor.
-  const experiences = [
-    {
-      tag: "edu",
-      label: "education",
-      hash: "7f3a9c2",
-      title:
-        "B.Tech CSE — Specialization in Information Security",
-      organization: "Vellore Institute of Technology (VIT), Vellore",
-      period: "2023 — 2027 (expected)",
-      description:
-        "Pursuing Computer Science and Engineering with a focus on cybersecurity, software development, and mobile application development.",
-      icon: Database,
-    },
-    {
-      tag: "work",
-      label: "internship",
-      hash: "b12d4e8",
-      title: "Artificial Intelligence Intern",
-      organization: "Martvalley Online Pvt. Ltd",
-      period: "May 2025 — Jul 2025",
-      description:
-        "Contributed real-time AI modules across 5+ development projects, cutting end-to-end processing latency by 30% and improving system throughput by 25%. Optimised ML training workflows and integrated models into production. Collaborated on pipelines processing 5,000+ images per week, raising model accuracy by 5%.",
-      icon: Cpu,
-    },
-    {
-      tag: "security",
-      label: "internship",
-      hash: "e5c018a",
-      title: "Cyber Security Analyst Intern",
-      organization: "IBM Career Education Program — Remote",
-      period: "May 2025 — Jun 2025",
-      description:
-        "Analysed simulated cyber threats and applied defensive strategies to secure system environments. Used industry-standard tools to monitor, detect, and report network vulnerabilities. Gained hands-on experience with malware analysis, threat intelligence, and penetration testing basics.",
-      icon: Shield,
-    },
-  ];
-
   return (
-    // Transparent ground: the page sits on the wave canvas mounted in
-    // app/page.tsx. An opaque bg here would paint straight over it.
-    <div className="min-h-screen bg-transparent text-green-400 relative overflow-hidden">
-      {/* Ambient tint only. The binary 0/1 texture and the cursor spotlight
-          that used to sit here are both gone. */}
-      <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-black to-cyan-900/20" />
-        </div>
-      </div>
+    <>
+      <TopBar mark="Ritik Roushan Rana" location="New Delhi" />
+      <Compass sections={SECTIONS} />
 
-      {/* Section dot navigation */}
-      <SectionDots
-        sections={[
-          { id: "home", label: "Home" },
-          { id: "skills", label: "Skills" },
-          { id: "projects", label: "Projects" },
-          { id: "experience", label: "Experience" },
-          { id: "contact", label: "Contact" },
-        ]}
-      />
+      <main>
+        {/* ---------------------------------------------------------------
+            HERO — a painting, edge to edge, with the nav over it and one
+            caption row pinned to the foot: who this is on the left, a way
+            down on the right. Nothing sits in the middle of the picture.
+            --------------------------------------------------------------- */}
+        <section id="home" className="hero">
+          <Painting />
 
-      {/* Navigation */}
-      <nav
-        className={`site-nav fixed left-1/2 z-50 transform -translate-x-1/2 transition-all duration-500 ${
-          isScrolled ? "site-nav--condensed top-3 scale-95" : "top-6 scale-100"
-        } ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
-        }`}
-      >
-        {/* relative + overflow-hidden so the shard canvas is clipped to the
-            pill's rounded edge instead of spilling past it. */}
-        <div
-          className={`site-nav__shell relative overflow-hidden bg-[#12081f]/80 backdrop-blur-md border border-purple-400/30 rounded-full ${
-            isScrolled ? "px-4 py-2 sm:px-6" : "px-4 py-2 sm:px-8 sm:py-3"
-          }`}
-        >
-          {/* Labels are hidden below sm: five labelled items measure roughly
-              590px, which does not fit a 375px viewport. Icons only there. */}
-          <div className="relative z-10 flex space-x-5 sm:space-x-8">
-            {[
-              { icon: Shield, label: "Home", target: "home" },
-              { icon: Zap, label: "Skills", target: "skills" },
-              { icon: Terminal, label: "Experience", target: "experience" },
-              { icon: Bug, label: "Projects", target: "projects" },
-              { icon: Mail, label: "Contact", target: "contact" },
-            ].map((item) => (
-              <button
-                key={item.label}
-                onClick={() => handleNavClick(item.target)}
-                aria-label={item.label}
-                className="site-nav__link flex items-center sm:space-x-2 text-purple-200 hover:text-white hover:scale-110 transition-all duration-200 font-mono text-sm cursor-pointer"
-              >
-                <item.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section
-        id="home"
-        className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8 pt-20"
-      >
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Introduction */}
-            <div
-              className={`space-y-8 transition-all duration-1000 ${
-                isVisible
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 -translate-x-10"
-              }`}
-            >
-              <div className="space-y-2">
-                <p className="text-cyan-400 font-mono text-base sm:text-lg flex items-center animate-fade-in">
-                  <Terminal className="mr-2 h-5 w-5" />
-                  Welcome to my digital portfolio
-                </p>
-
-                <h1 className="text-5xl sm:text-6xl lg:text-8xl font-bold text-white mb-4 hover:animate-pulse">
-                  Hello
-                </h1>
-
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-bold">
-                  I&apos;m{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-green-400 animate-gradient font-black uppercase tracking-wider">
-                    RITIK ROUSHAN RANA
-                  </span>
-                </h2>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed font-mono">
-                  <TypingEffect
-                    text="I’m a Computer Science student at VIT Vellore specializing in mobile and frontend development, creating responsive, user-focused apps with Flutter and modern frameworks, driven by a passion for cybersecurity and AI to build secure and innovative digital experiences."
-                    speed={30}
-                  />
-                </p>
-                <div className="flex flex-col space-y-2 text-gray-400 font-mono text-sm">
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="h-4 w-4 text-cyan-400" />
-                    <span>New Delhi, 110055</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Phone className="h-4 w-4 text-green-400" />
-                    <span>+91 8660405653</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <MagneticButton
-                  size="lg"
-                  onClick={() => handleNavClick("projects")}
-                  className="bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-700 hover:to-cyan-700 text-black font-semibold border-0"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  View Projects
-                </MagneticButton>
-                <MagneticButton
-                  variant="outline"
-                  size="lg"
-                  onClick={() => handleNavClick("contact")}
-                  className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 bg-transparent"
-                >
-                  <Shield className="mr-2 h-4 w-4" />
-                  Contact Me
-                </MagneticButton>
-              </div>
-
-              <div className="flex space-x-6">
-                {[
-                  {
-                    icon: Github,
-                    href: "https://github.com/ritik-roushan-rana?tab=repositories",
-                    label: "GitHub",
-                    glow: "social-link--github",
-                  },
-                  {
-                    icon: Linkedin,
-                    href: "https://www.linkedin.com/in/ritik-roushan-rana-b6a89528a/",
-                    label: "LinkedIn",
-                    glow: "social-link--linkedin",
-                  },
-                  {
-                    icon: Mail,
-                    href: "mailto:ritikrana8596@gmail.com",
-                    label: "Email",
-                    glow: "social-link--mail",
-                  },
-                ].map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    aria-label={social.label}
-                    target={
-                      social.href.startsWith("mailto:") ? "_self" : "_blank"
-                    }
-                    rel={
-                      social.href.startsWith("mailto:")
-                        ? ""
-                        : "noopener noreferrer"
-                    }
-                    className={`social-link ${social.glow} text-gray-400 hover:scale-125 hover:rotate-12`}
-                  >
-                    <social.icon className="h-6 w-6" />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Hero identity card */}
-            <div
-              className={`relative flex justify-center transition-all duration-1000 delay-300 ${
-                isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-              }`}
-            >
-              <div className="w-full">
-                <HeroPortrait />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Skills Section, rendered on the parallax layers. ParallaxComponent
-          owns the <section id="skills"> element so nav anchors and the section
-          dots still resolve to it. */}
-      <ParallaxComponent id="skills">
-        <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
-              <span className="text-cyan-400">&gt;</span> Skills
-            </h2>
-            <p className="text-base sm:text-xl text-gray-400 font-mono">
-              Technologies and tools I work with
-            </p>
-          </div>
-
-          <Reveal stagger className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {skillGroups.map((skillGroup, index) => (
-              <div
-                key={index}
-                className="relative group hover:-translate-y-2 hover:scale-105 transition-all duration-300"
-              >
-                <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-lg p-6 sm:p-8 h-full hover:border-cyan-500/50 transition-all duration-300 flex flex-col md:flex-row md:space-x-8">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${skillGroup.color} rounded-lg mb-4 group-hover:scale-110 transition-transform`}>
-                    <skillGroup.icon className="h-8 w-20 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 font-mono">
-                      {skillGroup.category}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {skillGroup.skills.map((skill, skillIndex) => (
-                        <Badge
-                          key={skillIndex}
-                          variant="outline"
-                          className="border-gray-600 text-gray-300 bg-gray-800/50 hover:border-cyan-500 hover:text-cyan-400 transition-colors font-mono text-xs"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Reveal>
-        </Reveal>
-      </ParallaxComponent>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-14 sm:py-20 relative">
-        <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
-              <span className="text-green-400">&gt;</span> Projects
-            </h2>
-            <p className="text-base sm:text-xl text-gray-400 font-mono">
-              Featured development and technical projects
-            </p>
-          </div>
-
-          <Reveal
-            stagger
-            className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl mx-auto"
-          >
-            {projects.map((project, index) => (
-              <ProjectCard
-                key={index}
-                project={project}
-                index={index}
-                descExpanded={Boolean(expandedDesc[index])}
-                techExpanded={Boolean(expandedTech[index])}
-                onToggleDesc={toggleDescExpansion}
-                onToggleTech={toggleTechExpansion}
+          <div className="hero__foot shell">
+            <div className="hero__plate">
+              <MaskText
+                as="h1"
+                className="display hero__name"
+                delay={1700}
+                lines={[<>Ritik Roushan Rana</>]}
               />
-            ))}
-          </Reveal>
-        </Reveal>
-      </section>
-      {/* Experience Section — rendered as a terminal "git log" of my career */}
-      <section id="experience" className="py-14 sm:py-20 relative">
-        <Reveal stagger className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
-              <span className="text-red-400">&gt;</span> Experience &amp; Education
-            </h2>
-            <p className="text-base sm:text-xl text-gray-400 font-mono">
-              My professional and academic background
-            </p>
-          </div>
 
-          <div className="career-term">
-            {/* Faux window title bar */}
-            <div className="career-term__bar" aria-hidden="true">
-              <span className="career-term__dot career-term__dot--red" />
-              <span className="career-term__dot career-term__dot--amber" />
-              <span className="career-term__dot career-term__dot--green" />
-              <span className="career-term__file">
-                ritik@portfolio:~$ git log --oneline career/
-              </span>
+              <MaskText
+                as="p"
+                className="hero__role"
+                delay={1950}
+                step={0}
+                lines={[
+                  <>
+                    Machine Learning Engineer — focused on deep RL, computer
+                    vision and systems that hold up under pressure.
+                  </>,
+                ]}
+              />
             </div>
 
-            <Reveal as="ol" stagger className="career-log">
-              {experiences.map((item, index) => (
-                <li key={index} className="career-log__entry">
-                  <span className="career-log__node" aria-hidden="true" />
-
-                  <div className="career-log__head">
-                    <span className="career-log__hash">{item.hash}</span>
-                    <span className={`career-log__tag career-log__tag--${item.tag}`}>
-                      <item.icon className="h-3 w-3" />
-                      {item.label}
-                    </span>
-                    <span className="career-log__date">{item.period}</span>
-                  </div>
-
-                  <h3 className="career-log__title">{item.title}</h3>
-                  <p className="career-log__org">{item.organization}</p>
-                  <p className="career-log__desc">{item.description}</p>
-                </li>
-              ))}
+            <Reveal delay={2150} className="hero__dive">
+              <button
+                type="button"
+                className="dive"
+                onClick={() => scrollToSection("about")}
+              >
+                Dive deeper
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </button>
             </Reveal>
           </div>
-        </Reveal>
-      </section>
+        </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-14 sm:py-20 relative">
-        <Reveal stagger className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 sm:p-8 lg:p-12 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-mono">
-              <span className="text-cyan-400">&gt;</span> Let&apos;s Connect &amp;
-              Collaborate
-            </h2>
-            <p className="text-base sm:text-xl text-gray-400 mb-8 max-w-2xl mx-auto font-mono">
-              Ready to discuss projects, opportunities, or just connect?
-              Let&apos;s build something amazing together.
+        {/* ---------------------------------------------------------------
+            ABOUT — a single statement that lights up word by word, paired
+            with the portrait. The statement is the section; there is no
+            second paragraph competing with it.
+            --------------------------------------------------------------- */}
+        <section id="about" className="section section--full">
+          <div className="shell grid gap-14 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-20">
+            <div>
+              <p className="eyebrow mb-10">01 — About</p>
+
+              <Statement text="I build things that hold up when someone is actively trying to break them." />
+
+              <Reveal stagger className="mt-10 max-w-xl space-y-5">
+                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
+                  I&apos;m a Computer Science student specialising in
+                  information security, splitting my time between shipping
+                  interfaces and taking them apart. Flutter and Next.js on one
+                  side; honeypots, log analysis and threat intelligence on the
+                  other.
+                </p>
+                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
+                  Most recently I worked on real-time AI modules at Martvalley
+                  and trained as a{" "}
+                  <span className="serif-accent">security analyst</span> through
+                  IBM&apos;s career education programme.
+                </p>
+                <a
+                  className="link-u inline-block font-mono text-xs uppercase tracking-[0.16em]"
+                  href="mailto:ritikrana8596@gmail.com"
+                >
+                  ritikrana8596@gmail.com
+                </a>
+              </Reveal>
+            </div>
+
+            <Reveal className="lg:pt-24">
+              <figure className="portrait">
+                <Image
+                  src="/profile-photo.jpeg"
+                  alt="Ritik Roushan Rana"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 90vw, 30rem"
+                  className="portrait__img"
+                />
+                <span className="portrait__levels" aria-hidden="true" />
+                <figcaption className="portrait__caption">
+                  New Delhi · 2026
+                </figcaption>
+              </figure>
+            </Reveal>
+          </div>
+        </section>
+
+
+        {/* ---------------------------------------------------------------
+            WORK — a dealt deck on a pinned stage. The header sits in the
+            shell; the deck itself is full-bleed and owns its own gutter.
+            See components/site/ProjectDeck.jsx.
+            --------------------------------------------------------------- */}
+        <section id="work" className="section">
+          <div className="shell mb-12 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="eyebrow mb-6">02 — Selected work</p>
+              <MaskText
+                as="h2"
+                className="display display--lg"
+                lines={[<>Things I&apos;ve</>, <>built</>]}
+              />
+            </div>
+            <p className="max-w-xs font-mono text-xs uppercase leading-relaxed tracking-[0.14em] text-[var(--muted)]">
+              Four projects, from reinforcement learning to supply-chain defence
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-700 hover:to-cyan-700 text-black font-semibold font-mono hover:scale-105 transition-transform"
-                onClick={() =>
-                  window.open("mailto:ritikrana8596@gmail.com", "_self")
+          </div>
+
+          <ProjectDeck
+            projects={PROJECTS}
+            all={[...PROJECTS, ...MORE_PROJECTS]}
+          />
+        </section>
+
+        {/* ---------------------------------------------------------------
+            PATH — experience and education as a master–detail: every role
+            listed, the selected one opened. See components/site/CareerTabs.jsx.
+            --------------------------------------------------------------- */}
+        <section id="path" className="section shell">
+          <div className="mb-12">
+            <p className="eyebrow mb-6">03 — Path</p>
+            <MaskText
+              as="h2"
+              className="display display--lg"
+              lines={[<>Where I&apos;ve</>, <>been</>]}
+            />
+          </div>
+
+          <CareerTabs items={CAREER} />
+        </section>
+
+        {/* ---------------------------------------------------------------
+            TOOLKIT — a mechanical keyboard, one row per group, that you can
+            click or literally type on. See components/site/StackKeyboard.jsx.
+            --------------------------------------------------------------- */}
+        <section id="toolkit" className="section shell">
+          <div className="mb-12">
+            <p className="eyebrow mb-6">04 — Toolkit</p>
+            <MaskText
+              as="h2"
+              className="display display--lg"
+              lines={[<>What I work</>, <>with</>]}
+            />
+          </div>
+
+          <Reveal>
+            <StackKeyboard groups={TOOLKIT} />
+          </Reveal>
+        </section>
+
+        {/* ---------------------------------------------------------------
+            CONTACT — the email itself as the headline, at display size.
+            --------------------------------------------------------------- */}
+        <section id="contact" className="section shell">
+          <p className="eyebrow mb-8">05 — Contact</p>
+
+          <MaskText
+            as="p"
+            className="display display--md max-w-3xl"
+            lines={[
+              <>
+                Got something worth{" "}
+                <span className="serif-accent">building</span>?
+              </>,
+            ]}
+          />
+
+          <Reveal className="mt-10">
+            <a
+              className="contact__huge"
+              href="mailto:ritikrana8596@gmail.com"
+              data-cursor="Mail"
+            >
+              Say hello
+            </a>
+          </Reveal>
+
+          <Reveal stagger className="mt-14 flex flex-wrap gap-3">
+            <a className="btn btn--solid" href="mailto:ritikrana8596@gmail.com">
+              <Mail className="h-4 w-4" />
+              ritikrana8596@gmail.com
+            </a>
+            <a
+              className="btn"
+              href={RESUME_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download résumé
+            </a>
+          </Reveal>
+        </section>
+      </main>
+
+      <footer className="footer shell">
+        <div className="footer__row">
+          <span>© {new Date().getFullYear()} Ritik Roushan Rana</span>
+          <div className="footer__socials">
+            {SOCIALS.map((social) => (
+              <a
+                key={social.label}
+                className="link-u"
+                href={social.href}
+                target={
+                  social.href.startsWith("mailto:") ? undefined : "_blank"
+                }
+                rel={
+                  social.href.startsWith("mailto:")
+                    ? undefined
+                    : "noopener noreferrer"
                 }
               >
-                <Mail className="mr-2 h-4 w-4" />
-                ritikrana8596@gmail.com
-              </Button>
-              <a
-                href="https://drive.google.com/file/d/1vhBi2CfbaQDo-NzdqEiLRe8hky1TdnFA/view?usp=sharing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-4 py-2 border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono bg-transparent hover:scale-105 transition-transform text-sm rounded-lg"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download Resume
+                {social.label}
               </a>
-            </div>
+            ))}
           </div>
-        </Reveal>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-400 font-mono">
-            &copy; 2024 Ritik Roushan Rana. Building the future, one line of
-            code at a time.
-          </p>
+          <span>New Delhi, India</span>
         </div>
       </footer>
-    </div>
+    </>
   );
 }
