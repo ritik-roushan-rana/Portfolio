@@ -282,12 +282,16 @@ function AllProjects({ projects, open, onClose, returnFocusRef }) {
         onClick={onClose}
       />
 
+      {/* data-lenis-prevent: Lenis is stopped while the panel is open, and a
+          stopped Lenis still swallows every wheel event on the page — this
+          attribute is what makes it leave the panel's own scroll alone. */}
       <div
         ref={panelRef}
         className="allp__panel"
         role="dialog"
         aria-modal="true"
         aria-label="All projects"
+        data-lenis-prevent=""
       >
         <header className="allp__bar">
           <p className="eyebrow">All projects — {projects.length}</p>
