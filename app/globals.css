@@ -956,7 +956,9 @@ main {
 .allp__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
-  gap: clamp(1rem, 2vw, 1.6rem);
+  /* Generous, and more between rows than between columns, so each tile
+     reads as its own object rather than one cell of a sheet. */
+  gap: clamp(2.5rem, 4.5vw, 4rem) clamp(1.5rem, 2.6vw, 2.5rem);
   width: 100%;
   max-width: var(--shell);
   margin-inline: auto;
@@ -986,7 +988,7 @@ main {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 0.7rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.1rem;
   display: grid;
   place-items: center;
 }
@@ -1014,7 +1016,7 @@ main {
   font-size: 0.6rem;
   letter-spacing: 0.18em;
   color: var(--gold);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.55rem;
 }
 
 .allp__title {
@@ -1023,7 +1025,7 @@ main {
   line-height: 1.05;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.45rem;
 }
 
 .allp__meta {
@@ -1032,7 +1034,7 @@ main {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(242, 230, 189, 0.7);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   line-height: 1.5;
 }
 
@@ -1046,7 +1048,7 @@ main {
   font-size: 0.78rem;
   line-height: 1.55;
   color: rgba(242, 230, 189, 0.62);
-  margin-bottom: 0.85rem;
+  margin-bottom: 1.1rem;
 }
 
 .allp__links {
