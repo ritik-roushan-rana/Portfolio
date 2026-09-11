@@ -226,7 +226,7 @@ function LedStrip({ message, tone, nonce }) {
 
 /* --- Board ---------------------------------------------------------------- */
 
-import { playKey } from "@/lib/key-sound";
+import { playKey, releaseKey } from "@/lib/key-sound";
 import { Volume2, VolumeX } from "lucide-react";
 
 const SOUND_KEY = "kb-sound";
@@ -275,21 +275,30 @@ export default function StackKeyboard({ groups }) {
   const soundRef = useRef(sound);
   soundRef.current = sound;
 
+  // The cap comes back up after 140ms, and the switch's release clack
+  // sounds with it — the up-stroke is half of what makes a key sound
+  // mechanical.
+  const release = (space) => {
+    window.clearTimeout(releaseTimer.current);
+    releaseTimer.current = window.setTimeout(() => {
+      setDown(null);
+      if (soundRef.current) releaseKey({ space });
+    }, 140);
+  };
+
   const press = (item) => {
     if (soundRef.current) playKey();
     setDown(item.key);
     // `n` makes an identical repeat press still restart the scroll.
     setMessage((m) => ({ text: item.name, tone: item.group, n: m.n + 1 }));
-    window.clearTimeout(releaseTimer.current);
-    releaseTimer.current = window.setTimeout(() => setDown(null), 140);
+    release(false);
   };
 
   const pressSpace = () => {
     if (soundRef.current) playKey({ space: true });
     setDown("space");
     setMessage((m) => ({ text: "", tone: null, n: m.n + 1 }));
-    window.clearTimeout(releaseTimer.current);
-    releaseTimer.current = window.setTimeout(() => setDown(null), 140);
+    release(true);
   };
 
   useEffect(() => {
