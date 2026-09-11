@@ -46,7 +46,7 @@ app/                 Next.js App Router entry
 components/
   Portfolio.jsx      Page composition and all content data
   site/              One file per interaction:
-                       SmoothScroll  Lenis host; publishes --scroll-v
+                       SmoothScroll  Lenis host
                        Preloader     Opening counter and column wipe
                        Cursor        Dot + lagging ring pointer
                        Grain         Film-grain and vignette plates
@@ -57,18 +57,23 @@ components/
                        Statement     Word-by-word scroll illumination
                        ProjectDeck   Pinned, scroll-dealt project card deck
                        Mark          The network logo, sized by its caller
-                       Sky           CSS sunset behind the hero
+                       Painting      Full-bleed painting behind the hero
                        CareerTabs    Master–detail experience tabs
-                       StackKeyboard Toolkit as a typeable 3D keyboard
+                       StackKeyboard Toolkit as a typeable keyboard with an LED strip
                        Reveal        Fade/slide entrance, optionally staggered
 lib/
   smooth-scroll.ts   Shared Lenis handle for in-page jumps
   deck-layout.js     Pure geometry for the project deck (no React, no DOM)
+  pixel-font.js      5x7 glyphs for the keyboard's LED strip
+  stack-icons.js     Brand marks for the keycaps (Simple Icons)
+  key-sound.js       Web Audio switch click for the keyboard
 public/
   projects/<slug>/   Screenshots per project, wired up in components/Portfolio.jsx
                      as a project's `shots: [{ src, label }]` array. The card
                      shows them as a swipeable gallery inside a device frame;
                      a project with no shots falls back to its wash and glyph.
+  hero/              The hero painting
+  logos/             Company marks for the experience tabs
   ...                Profile photo, preview image
 ```
 
