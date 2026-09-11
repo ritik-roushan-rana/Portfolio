@@ -1556,6 +1556,13 @@ main {
   line-height: 1.65;
   color: rgba(242, 230, 189, 0.66);
   max-width: 46ch;
+  /* Five lines at most: a longer summary pushed the stats and the button
+     below the card's edge, where the only way to reach them was to scroll
+     inside the card. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
 }
 
 /* --- Stat row ------------------------------------------------------------ */

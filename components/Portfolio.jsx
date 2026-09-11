@@ -121,7 +121,7 @@ const PROJECTS = [
     title: "SCBF",
     meta: "Security · Temporal graph networks · Patent pending",
     summary:
-      "Supply Chain Behavioral Fingerprinting: eBPF captures what a package actually does while it installs — syscalls, file writes, network connections, credential reads — a Temporal Graph Network encodes that into a behavioural fingerprint, and it is scored against a learned envelope of what legitimate packages of that type do. Matches the OSCAR benchmark's F1 at roughly 30x lower per-package latency.",
+      "Supply Chain Behavioral Fingerprinting: eBPF records what a package actually does while it installs, a Temporal Graph Network turns that into a behavioural fingerprint, and it is scored against what legitimate packages of its type do. Matches the OSCAR benchmark's F1 at ~30x lower per-package latency.",
     // Published numbers from the repo's own evaluation on the OSCAR benchmark
     // (Zenodo 13746167), test split at the tuned 0.35 threshold.
     stats: [
