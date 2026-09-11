@@ -439,11 +439,13 @@ export default function ProjectDeck({ projects, all = projects }) {
       };
     };
 
-    const layout = () => {
+    // The scroll position is passed in when Lenis drives the update (below),
+    // and read from the window when a native scroll event does.
+    const layout = (scrollY = window.scrollY) => {
       frameId = 0;
       const { top, height } = geomRef.current;
       const head = headFromScroll(
-        { top: top - window.scrollY, height },
+        { top: top - scrollY, height },
         window.innerHeight,
         projects.length
       );
@@ -489,8 +491,16 @@ export default function ProjectDeck({ projects, all = projects }) {
     };
 
     const onScroll = () => {
-      if (!frameId) frameId = requestAnimationFrame(layout);
+      if (!frameId) frameId = requestAnimationFrame(() => layout());
     };
+
+    // With Lenis the cards are updated from inside its own rAF tick, in the
+    // same frame and with the exact position it has just scrolled to. Waiting
+    // for the native scroll event instead means the sticky stage moves this
+    // frame and the cards catch up on the next: a one-frame lag between the
+    // stage and the deck on it, visible as a faint judder while pinned.
+    const onLenis = ({ scroll }) => layout(scroll);
+    let lenis = null;
 
     const onResize = () => {
       measure();
@@ -513,10 +523,14 @@ export default function ProjectDeck({ projects, all = projects }) {
         running = true;
         measure();
         layout();
-        window.addEventListener("scroll", onScroll, { passive: true });
+        lenis = getSmoothScroll();
+        if (lenis) lenis.on("scroll", onLenis);
+        else window.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", onResize, { passive: true });
       } else if (!motionOk.matches && running) {
         running = false;
+        if (lenis) lenis.off("scroll", onLenis);
+        lenis = null;
         window.removeEventListener("scroll", onScroll);
         window.removeEventListener("resize", onResize);
         if (frameId) cancelAnimationFrame(frameId);
@@ -530,6 +544,7 @@ export default function ProjectDeck({ projects, all = projects }) {
 
     return () => {
       motionOk.removeEventListener("change", sync);
+      if (lenis) lenis.off("scroll", onLenis);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       if (frameId) cancelAnimationFrame(frameId);

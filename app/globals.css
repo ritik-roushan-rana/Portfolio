@@ -205,7 +205,9 @@ main {
 
 .grain {
   position: fixed;
-  inset: -50%;
+  /* Only as large as its own drift needs (±3%): at the old -50% it was a
+     2x2-viewport texture being re-composited every 175ms. */
+  inset: -6%;
   z-index: 9998;
   pointer-events: none;
   opacity: 0.038;
@@ -1227,6 +1229,11 @@ main {
      stage, and the card must not push the rail off the top. */
   height: min(32rem, 66svh);
   margin: 0 auto;
+  /* Clips the card being dealt away as it slides up and out. Negative insets
+     leave room for what legitimately sits outside the box: the stacked
+     cards' rise above the top (up to 42px), and the shadow on the other
+     three sides. */
+  clip-path: inset(-48px -64px -90px -64px);
 }
 
 .deck__card {
@@ -1254,6 +1261,9 @@ main {
     inset 0 1px 0 rgba(242, 230, 189, 0.06);
   transform-origin: top center;
   will-change: transform, opacity;
+  /* Nothing inside a card can affect layout or paint outside it, and saying
+     so lets the engine skip the rest of the page when a card changes. */
+  contain: layout paint style;
 }
 
 /* Behind the front card only the top strip of the surface shows, so the
@@ -1637,6 +1647,7 @@ main {
     flex-direction: column;
     gap: 1.25rem;
     height: auto;
+    clip-path: none;
   }
 
   .deck__card {
@@ -2603,6 +2614,7 @@ main {
     flex-direction: column;
     gap: 1.25rem;
     height: auto;
+    clip-path: none;
   }
 
   .deck__card {

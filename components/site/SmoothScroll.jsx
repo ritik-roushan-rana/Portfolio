@@ -23,7 +23,7 @@ export default function SmoothScroll() {
       return undefined;
     }
 
-    const lenis = new Lenis({ lerp: 0.085, smoothWheel: true });
+    const lenis = new Lenis({ lerp: 0.11, smoothWheel: true });
     setSmoothScroll(lenis);
 
     let frameId = requestAnimationFrame(function raf(time) {
