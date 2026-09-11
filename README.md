@@ -26,7 +26,6 @@ Every animation is CSS transitions and keyframes driven by small `IntersectionOb
 - A layered CSS sunset with drifting cloud bands behind the hero — gradients, not images
 - A network mark (3 → 2 → 1, output node filled) used unframed as both the header logo and the hero symbol, with a signal running its edges
 - A centred nameplate over a CSS sunset: name, role, calls to action and availability, and nothing else
-- Counter preloader that wipes away in columns to uncover the hero
 - Custom two-part pointer that enlarges and labels itself over anything interactive
 - Masked line-by-line reveals on every headline
 - A statement that lights up word by word as it crosses the viewport
@@ -47,7 +46,6 @@ components/
   Portfolio.jsx      Page composition and all content data
   site/              One file per interaction:
                        SmoothScroll  Lenis host
-                       Preloader     Opening counter and column wipe
                        Cursor        Dot + lagging ring pointer
                        Grain         Film-grain and vignette plates
                        TopBar        Retracting header with a live clock

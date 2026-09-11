@@ -6,7 +6,6 @@ import Progress from '@/components/site/Progress'
 import SmoothScroll from '@/components/site/SmoothScroll'
 import Cursor from '@/components/site/Cursor'
 import Grain from '@/components/site/Grain'
-import Preloader from '@/components/site/Preloader'
 import './globals.css'
 
 /**
@@ -63,7 +62,6 @@ export default function RootLayout({
             section: the scroll driver, the opening title card, the pointer,
             the grain plate and the read-progress hairline. */}
         <SmoothScroll />
-        <Preloader />
         <Cursor />
         <Grain />
         <Progress />
