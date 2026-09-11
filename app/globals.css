@@ -317,6 +317,87 @@ main {
 }
 
 /* ===========================================================================
+   GRID INTRO
+   ---------------------------------------------------------------------------
+   See components/site/GridIntro.jsx. A fixed plate over the page: a grid of
+   dark tiles (the cover) and, above them, the rules. The rules draw, the
+   tiles clear on a diagonal to show the painting through the frame, the
+   rules fade, the layer unmounts.
+   =========================================================================== */
+
+.gintro {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+}
+
+.gintro__cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.gintro__cell {
+  background: var(--ground-deep);
+  opacity: 1;
+  transition: opacity 520ms var(--ease) var(--d, 0ms);
+}
+
+.gintro--cells .gintro__cell,
+.gintro--out .gintro__cell {
+  opacity: 0;
+}
+
+.gintro__lines {
+  position: absolute;
+  inset: 0;
+  transition: opacity 500ms var(--ease);
+}
+
+.gintro--out .gintro__lines {
+  opacity: 0;
+}
+
+.gintro__v,
+.gintro__h {
+  position: absolute;
+  background: rgba(242, 230, 189, 0.34);
+}
+
+.gintro__v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  animation: gintro-v 640ms var(--ease) var(--d, 0ms) forwards;
+}
+
+.gintro__h {
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  animation: gintro-h 640ms var(--ease) var(--d, 0ms) forwards;
+}
+
+@keyframes gintro-v {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes gintro-h {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ===========================================================================
    MASKED LINE REVEAL
    ---------------------------------------------------------------------------
    Each line sits in an overflow-hidden box and slides up from below it, so the
@@ -604,7 +685,7 @@ main {
   /* Keep the horizon in frame: crop from the sky first on tall viewports,
      never from the meadow. */
   object-position: 50% 62%;
-  animation: painting-in 1.6s var(--ease) both;
+  animation: painting-in 1.6s var(--ease) 0.45s both;
 }
 
 @keyframes painting-in {

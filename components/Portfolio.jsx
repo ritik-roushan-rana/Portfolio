@@ -392,14 +392,14 @@ export default function Portfolio() {
               <MaskText
                 as="h1"
                 className="display hero__name"
-                delay={300}
+                delay={1500}
                 lines={[<>Ritik Roushan Rana</>]}
               />
 
               <MaskText
                 as="p"
                 className="hero__role"
-                delay={550}
+                delay={1750}
                 step={0}
                 lines={[
                   <>
@@ -410,7 +410,7 @@ export default function Portfolio() {
               />
             </div>
 
-            <Reveal delay={750} className="hero__dive">
+            <Reveal delay={1950} className="hero__dive">
               <button
                 type="button"
                 className="dive"

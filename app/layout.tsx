@@ -4,6 +4,7 @@ import { GeistMono } from 'geist/font/mono'
 import { Instrument_Serif } from 'next/font/google'
 import Progress from '@/components/site/Progress'
 import SmoothScroll from '@/components/site/SmoothScroll'
+import GridIntro from '@/components/site/GridIntro'
 import Cursor from '@/components/site/Cursor'
 import Grain from '@/components/site/Grain'
 import './globals.css'
@@ -62,6 +63,7 @@ export default function RootLayout({
             section: the scroll driver, the opening title card, the pointer,
             the grain plate and the read-progress hairline. */}
         <SmoothScroll />
+        <GridIntro />
         <Cursor />
         <Grain />
         <Progress />
