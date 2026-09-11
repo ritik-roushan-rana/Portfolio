@@ -2265,13 +2265,49 @@ main {
   outline-offset: 2px;
 }
 
+/* Under the case, as wide as the case: hint on the left, sound toggle right. */
+.kb__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  width: 100%;
+  max-width: 54.5rem;
+}
+
+.kb__sound {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  background: none;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 260ms var(--ease),
+    border-color 260ms var(--ease);
+}
+
+.kb__sound:hover,
+.kb__sound[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: rgba(242, 230, 189, 0.4);
+}
+
 .kb__hint {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 0.6rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
-  text-align: center;
+  text-align: left;
 }
 
 /* --- Narrow screens ------------------------------------------------------ */

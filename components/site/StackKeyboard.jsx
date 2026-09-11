@@ -226,6 +226,11 @@ function LedStrip({ message, tone, nonce }) {
 
 /* --- Board ---------------------------------------------------------------- */
 
+import { playKey } from "@/lib/key-sound";
+import { Volume2, VolumeX } from "lucide-react";
+
+const SOUND_KEY = "kb-sound";
+
 export default function StackKeyboard({ groups }) {
   const layout = useMemo(() => {
     const rows = buildLayout(groups);
@@ -247,7 +252,31 @@ export default function StackKeyboard({ groups }) {
   const [message, setMessage] = useState({ text: "", tone: null, n: 0 });
   const releaseTimer = useRef(0);
 
+  // Sound is on by default and the choice is remembered per browser. Read
+  // after mount so the server and first client render agree.
+  const [sound, setSound] = useState(true);
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(SOUND_KEY) === "off") setSound(false);
+    } catch {
+      /* storage unavailable: stay on */
+    }
+  }, []);
+  const toggleSound = () => {
+    setSound((on) => {
+      try {
+        window.localStorage.setItem(SOUND_KEY, on ? "off" : "on");
+      } catch {
+        /* ignore */
+      }
+      return !on;
+    });
+  };
+  const soundRef = useRef(sound);
+  soundRef.current = sound;
+
   const press = (item) => {
+    if (soundRef.current) playKey();
     setDown(item.key);
     // `n` makes an identical repeat press still restart the scroll.
     setMessage((m) => ({ text: item.name, tone: item.group, n: m.n + 1 }));
@@ -256,6 +285,7 @@ export default function StackKeyboard({ groups }) {
   };
 
   const pressSpace = () => {
+    if (soundRef.current) playKey({ space: true });
     setDown("space");
     setMessage((m) => ({ text: "", tone: null, n: m.n + 1 }));
     window.clearTimeout(releaseTimer.current);
@@ -349,7 +379,19 @@ export default function StackKeyboard({ groups }) {
         </div>
       </div>
 
-      <p className="kb__hint">Click a cap, or type its corner letter. Space clears the display.</p>
+      <div className="kb__foot">
+        <p className="kb__hint">Click a cap, or type its corner letter. Space clears the display.</p>
+        <button
+          type="button"
+          className="kb__sound"
+          onClick={toggleSound}
+          aria-pressed={sound}
+          aria-label={sound ? "Turn key sounds off" : "Turn key sounds on"}
+        >
+          {sound ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+          {sound ? "Sound on" : "Sound off"}
+        </button>
+      </div>
     </div>
   );
 }

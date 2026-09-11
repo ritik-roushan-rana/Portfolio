@@ -437,9 +437,9 @@ export default function Portfolio() {
 
               <Reveal stagger className="mt-10 max-w-xl space-y-5">
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  Final-year CSE (InfoSec) student at VIT Vellore, focused on{" "}
-                  <span className="serif-accent">machine learning</span>, data
-                  science and AI, with cybersecurity on the side. Solid
+                  Final-year CSE (InfoSec) student at VIT Vellore, focused on
+                  machine learning, data science and AI, with cybersecurity
+                  on the side. Solid
                   grounding in programming and DSA; I&apos;d rather reach for
                   a data-driven answer than a guess.
                 </p>
