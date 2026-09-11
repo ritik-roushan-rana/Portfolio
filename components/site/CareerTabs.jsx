@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Experience as a master–detail: every role listed down the left, the selected
@@ -18,10 +18,14 @@ import { useEffect, useId, useRef, useState } from "react";
  * rail turns into a horizontal strip above the pane rather than a second
  * accordion markup — one DOM, one set of content.
  */
-export default function CareerTabs({ items }) {
+export default function CareerTabs({ items, id = "career" }) {
   const [active, setActive] = useState(0);
   const tabRefs = useRef([]);
-  const baseId = useId();
+  // A fixed prefix rather than useId(): the ids only need to be unique on
+  // the page (there is one of these), and useId's tree-position-derived
+  // value came out different on the server and the client in dev, which
+  // logged a hydration mismatch on every load.
+  const baseId = id;
 
   // Re-run the pane's entrance whenever the selection changes. A key on the
   // pane would remount it; toggling a class keeps the node and just replays
