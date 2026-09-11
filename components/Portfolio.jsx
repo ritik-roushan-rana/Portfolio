@@ -433,22 +433,25 @@ export default function Portfolio() {
             <div>
               <p className="eyebrow mb-10">01 — About</p>
 
-              <Statement text="I build machine learning models and get them working in the real world." />
+              <Statement text="I like solving problems with data, and building the models that do it." />
 
               <Reveal stagger className="mt-10 max-w-xl space-y-5">
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  I&apos;m a CS student at VIT Vellore working on{" "}
-                  <span className="serif-accent">deep reinforcement learning</span>{" "}
-                  and computer vision. I&apos;ve trained RL agents to
-                  rebalance stock portfolios, built a detector for emergency
-                  vehicles in traffic video, and an XGBoost model for fraud
-                  detection. Mostly Python, PyTorch and Stable-Baselines3.
+                  Final-year CSE (InfoSec) student at VIT Vellore, focused on{" "}
+                  <span className="serif-accent">machine learning</span>, data
+                  science and AI, with cybersecurity on the side. Solid
+                  grounding in programming and DSA; I&apos;d rather reach for
+                  a data-driven answer than a guess.
                 </p>
                 <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
-                  At Martvalley I put real-time AI modules into production and
-                  worked on an image pipeline handling 5,000+ images a week.
-                  I care about clean data, proper evaluation, and models that
-                  actually ship. Open to ML roles and internships.
+                  Right now I&apos;m building real experience in predictive
+                  modelling and data analysis, and going deeper into neural
+                  networks and reinforcement learning. I also build mobile
+                  apps in Flutter.
+                </p>
+                <p className="text-[0.98rem] leading-relaxed text-[rgba(242,230,189,0.62)]">
+                  Curious and quick to adapt. Looking to build things that
+                  matter and grow in ML, data science and AI.
                 </p>
                 <a
                   className="link-u inline-block font-mono text-xs uppercase tracking-[0.16em]"
