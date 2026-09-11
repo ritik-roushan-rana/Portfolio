@@ -226,7 +226,7 @@ function LedStrip({ message, tone, nonce }) {
 
 /* --- Board ---------------------------------------------------------------- */
 
-import { playKey, releaseKey } from "@/lib/key-sound";
+import { playKey, prime, releaseKey } from "@/lib/key-sound";
 import { Volume2, VolumeX } from "lucide-react";
 
 const SOUND_KEY = "kb-sound";
@@ -305,7 +305,12 @@ export default function StackKeyboard({ groups }) {
     const root = rootRef.current;
     if (!root) return undefined;
     let inView = false;
-    const io = new IntersectionObserver(([e]) => { inView = e.isIntersecting; }, { threshold: 0.3 });
+    const io = new IntersectionObserver(([e]) => {
+      inView = e.isIntersecting;
+      // Fetch and decode the recording as the board scrolls into view, so
+      // the first press plays the real sound rather than the fallback.
+      if (inView && soundRef.current) prime();
+    }, { threshold: 0.3 });
     io.observe(root);
 
     const onKey = (event) => {
