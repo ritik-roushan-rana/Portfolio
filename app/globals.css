@@ -317,84 +317,49 @@ main {
 }
 
 /* ===========================================================================
-   GRID INTRO
+   FRAME INTRO
    ---------------------------------------------------------------------------
-   See components/site/GridIntro.jsx. A fixed plate over the page: a grid of
-   dark tiles (the cover) and, above them, the rules. The rules draw, the
-   tiles clear on a diagonal to show the painting through the frame, the
-   rules fade, the layer unmounts.
+   See components/site/FrameIntro.jsx. The window's box-shadow is the cover:
+   a 200vmax spread of the ground colour around a transparent box, so what is
+   inside the box is the hero underneath and what is outside is dark. Opening
+   the window is a transition on `inset`.
    =========================================================================== */
 
-.gintro {
+.fintro {
   position: fixed;
   inset: 0;
   z-index: 9997;
   pointer-events: none;
+  overflow: hidden;
 }
 
-.gintro__cells {
+.fintro__window {
   position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-}
-
-.gintro__cell {
-  background: var(--ground-deep);
-  opacity: 1;
-  transition: opacity 520ms var(--ease) var(--d, 0ms);
-}
-
-.gintro--cells .gintro__cell,
-.gintro--out .gintro__cell {
+  /* Closed: a small landscape rectangle in the middle of the screen. */
+  inset: 38vh 33vw;
+  border: 1px solid rgba(242, 230, 189, 0.55);
+  box-shadow: 0 0 0 200vmax var(--ground-deep);
   opacity: 0;
+  animation: fintro-appear 420ms var(--ease) forwards;
+  transition:
+    inset 1.25s cubic-bezier(0.7, 0, 0.2, 1),
+    border-color 400ms var(--ease) 850ms;
 }
 
-.gintro__lines {
-  position: absolute;
-  inset: 0;
-  transition: opacity 500ms var(--ease);
-}
-
-.gintro--out .gintro__lines {
-  opacity: 0;
-}
-
-.gintro__v,
-.gintro__h {
-  position: absolute;
-  background: rgba(242, 230, 189, 0.34);
-}
-
-.gintro__v {
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  transform: scaleY(0);
-  transform-origin: 50% 0;
-  animation: gintro-v 640ms var(--ease) var(--d, 0ms) forwards;
-}
-
-.gintro__h {
-  left: 0;
-  right: 0;
-  height: 1px;
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  animation: gintro-h 640ms var(--ease) var(--d, 0ms) forwards;
-}
-
-@keyframes gintro-v {
+@keyframes fintro-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
   to {
-    transform: scaleY(1);
+    opacity: 1;
+    transform: none;
   }
 }
 
-@keyframes gintro-h {
-  to {
-    transform: scaleX(1);
-  }
+.fintro--open .fintro__window {
+  inset: 0;
+  border-color: transparent;
 }
 
 /* ===========================================================================
@@ -685,7 +650,7 @@ main {
   /* Keep the horizon in frame: crop from the sky first on tall viewports,
      never from the meadow. */
   object-position: 50% 62%;
-  animation: painting-in 1.6s var(--ease) 0.45s both;
+  animation: painting-in 1.6s var(--ease) both;
 }
 
 @keyframes painting-in {
