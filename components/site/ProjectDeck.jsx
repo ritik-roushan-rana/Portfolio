@@ -688,6 +688,18 @@ export default function ProjectDeck({ projects, all = projects }) {
               <span className="deck__tint" aria-hidden="true" />
             </article>
           ))}
+
+          {/* Below the desktop breakpoint the index rail (and its "See all")
+              is hidden, so the stacked list carries its own way to the rest
+              of the work. Hidden again where the rail is showing. */}
+          <button
+            type="button"
+            className="btn deck__more"
+            onClick={() => setShowAll(true)}
+          >
+            See all {all.length} projects
+            <ArrowUpRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
