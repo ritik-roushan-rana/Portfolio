@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
  * reduced-motion visitors skip it.
  */
 const OPEN = 450;   // frame has appeared; start opening
-const DONE = 1900;  // fully open, border gone; unmount (the CSS opens faster on phones; the layer is invisible by then either way)
+const DONE = 1900;  // fully open, border gone; unmount
 
 export default function FrameIntro() {
   const [phase, setPhase] = useState("closed"); // closed -> open -> done

@@ -183,14 +183,6 @@ main {
   justify-content: center;
 }
 
-@media (max-width: 899px) {
-  /* Content-height on a phone: stacked, the portrait alone is nearly a
-     screen, and a forced 100svh only adds empty ground above it. */
-  .section--full {
-    min-height: 0;
-  }
-}
-
 /* Hairline section divider that draws itself in as the section arrives. */
 .rule {
   height: 1px;
@@ -317,15 +309,6 @@ main {
 
 /* Hidden entirely on touch and for reduced motion — the native cursor is
    better than a laggy imitation. */
-/* No grain drift on touch devices: a full-screen texture re-composited
-   every 175ms is a real battery cost on a phone, for an effect nobody is
-   close enough to notice there. The plate stays; only the motion goes. */
-@media (hover: none), (pointer: coarse) {
-  .grain {
-    animation: none;
-  }
-}
-
 @media (hover: none), (pointer: coarse) {
   .cursor-dot,
   .cursor-ring {
@@ -377,15 +360,6 @@ main {
 .fintro--open .fintro__window {
   inset: 0;
   border-color: transparent;
-}
-
-@media (max-width: 640px) {
-  /* A portrait window on a portrait screen, and a shorter opening — the
-     travel is smaller, so the same duration read as slow. */
-  .fintro__window {
-    inset: 36vh 22vw;
-    transition-duration: 0.95s;
-  }
 }
 
 /* ===========================================================================
@@ -797,30 +771,11 @@ main {
 
 @media (max-width: 640px) {
   .hero {
-    padding-bottom: 2.5rem;
+    padding-bottom: 1.75rem;
   }
 
   .hero__foot {
-    flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
-  }
-
-  /* On a phone the name has the whole width, so it is sized to it rather
-     than to the desktop's 5.6vw, which came out at 38px under a 800px
-     painting. Two lines are fine. */
-  .hero__name {
-    font-size: clamp(2.6rem, 12.5vw, 3.6rem);
-  }
-
-  .hero__role {
-    font-size: 0.78rem;
-    line-height: 1.55;
-  }
-
-  /* The scrim has to climb higher to sit under three rows of caption. */
-  .painting__fade {
-    height: 62%;
   }
 }
 
@@ -1658,7 +1613,7 @@ main {
   .deck__stage {
     position: static;
     height: auto;
-    padding-inline: var(--gutter);
+    padding-inline: 0;
     overflow: visible;
   }
 
@@ -1676,33 +1631,16 @@ main {
     grid-template-columns: minmax(0, 1fr);
     opacity: 1;
     transform: none;
-    /* The scroll-driven loop is off below this width, so the card can
-       take the cheaper static shadow and needs no compositing hint. */
-    will-change: auto;
-    contain: none;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-  }
-
-  /* No reveal animation on the list: every card is simply there, so the
-     page never shows a blank card while an observer catches up. */
-  .deck__card--back .deck__art,
-  .deck__card--back .deck__body {
-    visibility: visible;
   }
 
   .deck__art {
     aspect-ratio: 16 / 9;
   }
 
-  /* Portrait, so a phone screenshot is big enough to actually read. A
+  /* Square, so a portrait device shot is big enough to read on a phone. A
      class rather than :has(), which is not worth relying on for layout. */
   .deck__art--shot {
-    aspect-ratio: 4 / 5;
-  }
-
-  .deck__shot {
-    top: 6%;
-    height: 84%;
+    aspect-ratio: 1 / 1;
   }
 
   /* A landscape window in a square panel would float in a sea of wash. */
@@ -1715,18 +1653,6 @@ main {
   }
 
   .deck__tint {
-    display: none;
-  }
-
-  .deck__more {
-    align-self: center;
-    margin-top: 0.5rem;
-  }
-}
-
-/* Only the stacked list needs it; the pinned deck has the rail. */
-@media (min-width: 900px) {
-  .deck__more {
     display: none;
   }
 }
@@ -2004,22 +1930,12 @@ main {
     gap: 1.5rem;
   }
 
-  /* The rail bleeds to the screen edges and scrolls, so the third role is
-     reachable with a swipe rather than clipped off. */
   .ctabs__rail {
     flex-direction: row;
     gap: 0.5rem;
     overflow-x: auto;
-    margin-inline: calc(-1 * var(--gutter));
-    padding-inline: var(--gutter);
     padding-bottom: 0.5rem;
     scrollbar-width: none;
-    scroll-snap-type: x proximity;
-    scroll-padding-inline: var(--gutter);
-  }
-
-  .ctabs__tab {
-    scroll-snap-align: start;
   }
 
   .ctabs__rail::-webkit-scrollbar {
@@ -2108,12 +2024,9 @@ main {
 /* Sized to its widest row, not stretched to the section: a keyboard is as
    wide as its keys. The flexible modifiers then absorb only the small
    differences between rows, not a whole missing column. */
-.kb__scroll {
-  max-width: 100%;
-}
-
 .kb__case {
   width: fit-content;
+  max-width: 100%;
   padding: 1rem;
   border-radius: 1.1rem;
   background: linear-gradient(180deg, #ece4d3, #d9cfb9);
@@ -2385,40 +2298,15 @@ main {
     align-items: stretch;
   }
 
-  /* The wrapper scrolls; the case inside keeps its natural width. Bleeds
-     to the screen edges so the board is not boxed inside the gutter, with
-     the gutter re-applied as padding so the first key still lines up. */
-  .kb__scroll {
+  .kb__case {
     max-width: none;
-    margin-inline: calc(-1 * var(--gutter));
-    padding-inline: var(--gutter);
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;
   }
 
-  .kb__scroll::-webkit-scrollbar {
+  .kb__case::-webkit-scrollbar {
     display: none;
-  }
-
-  .kb__case {
-    scroll-snap-align: start;
-  }
-
-  .kb__hint {
-    text-align: left;
-  }
-
-  /* The hint reads differently on a phone: there are no corner letters to
-     type, but the board scrolls. */
-  .kb__hint::after {
-    content: " Swipe the board to see every key.";
-  }
-
-  .kb__foot {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .kb__bezel {
@@ -2592,8 +2480,7 @@ main {
 .contact__huge {
   display: inline-block;
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(2rem, 13vw, 11rem);
-  overflow-wrap: anywhere;
+  font-size: clamp(3rem, 13vw, 11rem);
   line-height: 0.85;
   letter-spacing: -0.04em;
   text-transform: uppercase;

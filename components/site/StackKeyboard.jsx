@@ -332,10 +332,6 @@ export default function StackKeyboard({ groups }) {
 
   return (
     <div ref={rootRef} className="kb">
-      {/* On a phone the board is wider than the screen; this wrapper is what
-          scrolls sideways, so the case keeps its shape and the page does not
-          grow. */}
-      <div className="kb__scroll">
       <div className="kb__case">
         <div className="kb__bezel">
           <LedStrip message={message.text} tone={message.tone} nonce={message.n} />
@@ -395,7 +391,6 @@ export default function StackKeyboard({ groups }) {
             </div>
           ))}
         </div>
-      </div>
       </div>
 
       <div className="kb__foot">
